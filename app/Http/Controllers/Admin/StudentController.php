@@ -93,4 +93,20 @@ class StudentController extends Controller
         return redirect()->route('admin.students.index')
             ->with('success', 'Student deleted successfully.');
     }
+
+    public function search(Request $request)
+    {
+        try {
+            $search = $request->get('search');
+            
+            $students = Student::where('student_id', 'LIKE', "%{$search}%")
+                ->orWhere('name', 'LIKE', "%{$search}%")
+                ->limit(10)
+                ->get(['id', 'student_id', 'name']);
+
+            return response()->json($students);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

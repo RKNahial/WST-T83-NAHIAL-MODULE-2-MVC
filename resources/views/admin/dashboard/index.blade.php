@@ -3,14 +3,6 @@
 @section('title', 'Admin Dashboard')
 
 @section('content')
-<!-- <div class="pagetitle">
-    <h1>Admin Dashboard</h1>
-    <nav>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active">Dashboard</li>
-        </ol>
-    </nav>
-</div> -->
 
 <section class="section dashboard">
     <div class="row">
@@ -132,8 +124,8 @@
                                 <tbody>
                                     @foreach($recentStudents as $student)
                                     <tr>
-                                        <th scope="row"><a href="#">#{{ $student->student_id }}</a></th>
-                                        <td>{{ $student->first_name }} {{ $student->last_name }}</td>
+                                        <th scope="row"><a href="#">#{{ $student->id }}</a></th>
+                                        <td>{{ $student->name }}</td> 
                                         <td>{{ $student->course }}</td>
                                         <td>{{ $student->year_level }}</td>
                                         <td><span class="badge bg-success">Active</span></td>

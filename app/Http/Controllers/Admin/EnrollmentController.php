@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Enrollment;
+use App\Models\Student;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 
 class EnrollmentController extends Controller
@@ -28,7 +30,11 @@ class EnrollmentController extends Controller
      */
     public function create()
     {
-        //
+        $students = Student::all();
+        $subjects = Subject::all();
+        $academicYears = $this->generateAcademicYears();
+        
+        return view('admin.enrollments.create', compact('students', 'subjects', 'academicYears'));
     }
 
     /**
@@ -36,7 +42,22 @@ class EnrollmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'semester' => 'required|in:1,2,3',
+            'academic_year' => 'required|string',
+            'status' => 'required|in:enrolled,dropped,completed'
+        ]);
+
+        try {
+            Enrollment::create($validated);
+            return redirect()->route('admin.enrollments.index')
+                ->with('success', 'Enrollment created successfully');
+        } catch (\Exception $e) {
+            return back()->withInput()
+                ->withErrors(['error' => 'Failed to create enrollment. ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -50,24 +71,64 @@ class EnrollmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Enrollment $enrollment)
     {
-        //
+        $students = Student::all();
+        $subjects = Subject::all();
+        $academicYears = $this->generateAcademicYears();
+        
+        return view('admin.enrollments.edit', compact('enrollment', 'students', 'subjects', 'academicYears'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Enrollment $enrollment)
     {
-        //
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'semester' => 'required|in:1,2,3',
+            'academic_year' => 'required|string',
+            'status' => 'required|in:enrolled,dropped,completed'
+        ]);
+
+        try {
+            $enrollment->update($validated);
+            return redirect()->route('admin.enrollments.index')
+                ->with('success', 'Enrollment updated successfully');
+        } catch (\Exception $e) {
+            return back()->withInput()
+                ->withErrors(['error' => 'Failed to update enrollment. ' . $e->getMessage()]);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Enrollment $enrollment)
     {
-        //
+        try {
+            $enrollment->delete();
+            return redirect()->route('admin.enrollments.index')
+                ->with('success', 'Enrollment deleted successfully');
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['error' => 'Failed to delete enrollment. ' . $e->getMessage()]);
+        }
+    }
+
+    private function generateAcademicYears()
+    {
+        $currentYear = date('Y');
+        $years = [];
+        
+        for ($i = -1; $i <= 1; $i++) {
+            $year = $currentYear + $i;
+            $academicYear = $year . '-' . ($year + 1);
+            $years[$academicYear] = $academicYear;
+        }
+        
+        return $years;
     }
 }

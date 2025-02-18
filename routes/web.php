@@ -35,18 +35,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/students/{student}/edit', [StudentController::class, 'edit'])->name('students.edit');
     Route::put('/students/{student}', [StudentController::class, 'update'])->name('students.update');
     Route::delete('/students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
+    Route::get('students/search', [App\Http\Controllers\Admin\StudentController::class, 'search'])->name('students.search');
 
     // Subjects
     Route::resource('subjects', SubjectController::class);
 
     // Enrollments
-    Route::get('/enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
-    Route::get('/enrollments/create', [EnrollmentController::class, 'create'])->name('enrollments.create');
-    Route::post('/enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
-    Route::get('/enrollments/{enrollment}', [EnrollmentController::class, 'show'])->name('enrollments.show');
-    Route::get('/enrollments/{enrollment}/edit', [EnrollmentController::class, 'edit'])->name('enrollments.edit');
-    Route::put('/enrollments/{enrollment}', [EnrollmentController::class, 'update'])->name('enrollments.update');
-    Route::delete('/enrollments/{enrollment}', [EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
+    Route::resource('enrollments', EnrollmentController::class);
 
     // Grades
     Route::get('/grades', [GradeController::class, 'index'])->name('grades.index');
