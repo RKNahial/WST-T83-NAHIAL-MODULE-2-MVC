@@ -11,13 +11,10 @@ class Student extends Model
 
     protected $fillable = [
         'student_id',
-        'first_name',
-        'last_name',
-        'course',
-        'year_level',
+        'name',
         'email',
-        'contact_number',
-        'address'
+        'course',
+        'year_level'
     ];
 
     public function enrollments()

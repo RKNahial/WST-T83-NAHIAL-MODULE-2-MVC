@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Enrollment;
 use Illuminate\Http\Request;
 
 class EnrollmentController extends Controller
@@ -12,7 +13,14 @@ class EnrollmentController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $enrollments = Enrollment::with(['student', 'subject'])->get();
+            return view('admin.enrollments.index', compact('enrollments'));
+        } catch (\Exception $e) {
+            \Log::error('Enrollment index error: ' . $e->getMessage());
+            dd($e->getMessage()); // Temporary for debugging
+            return back()->with('error', 'An error occurred while loading enrollments.');
+        }
     }
 
     /**

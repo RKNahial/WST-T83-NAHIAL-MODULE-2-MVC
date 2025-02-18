@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 
 class SubjectController extends Controller
@@ -12,7 +13,14 @@ class SubjectController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $subjects = Subject::all();
+            return view('admin.subjects.index', compact('subjects'));
+        } catch (\Exception $e) {
+            \Log::error('Subject index error: ' . $e->getMessage());
+            dd($e->getMessage()); // Temporary for debugging
+            return back()->with('error', 'An error occurred while loading subjects.');
+        }
     }
 
     /**
@@ -20,7 +28,7 @@ class SubjectController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.subjects.create');
     }
 
     /**

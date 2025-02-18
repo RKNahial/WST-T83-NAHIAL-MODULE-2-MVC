@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Grade;
 
 class GradeController extends Controller
 {
@@ -12,7 +13,13 @@ class GradeController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $grades = Grade::with(['student', 'subject'])->get();
+            return view('admin.grades.index', compact('grades'));
+        } catch (\Exception $e) {
+            \Log::error('Grade index error: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred while loading grades.');
+        }
     }
 
     /**
