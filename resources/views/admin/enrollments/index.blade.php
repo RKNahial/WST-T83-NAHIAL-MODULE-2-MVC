@@ -39,7 +39,7 @@
                     <h5 class="card-title">Enrollments List</h5>
                     
                     <!-- Add Button -->
-                    <div class="d-flex justify-content-end mb-4">
+                    <div class="-flex justify-content-between align-items-center mb-2">
                         <a href="{{ route('admin.enrollments.create') }}" class="btn btn-primary">
                             <i class="bi bi-plus-circle"></i> New Enrollment
                         </a>

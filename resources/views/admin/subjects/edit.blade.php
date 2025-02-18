@@ -55,7 +55,7 @@
                             @enderror
                         </div>
 
-                        <div class="text-start">
+                        <div class="d-flex justify-content-end gap-2">
                             <button type="submit" class="btn btn-primary">Update Subject</button>
                             <a href="{{ route('admin.subjects.index') }}" class="btn btn-secondary">Cancel</a>
                         </div>

@@ -88,7 +88,7 @@
                         </div>
 
                         <!-- Form Buttons -->
-                        <div class="text-end">
+                        <div class="d-flex justify-content-end gap-2">
                             <button type="submit" class="btn btn-primary">Update Enrollment</button>
                             <a href="{{ route('admin.enrollments.index') }}" class="btn btn-secondary">Cancel</a>
                         </div>
