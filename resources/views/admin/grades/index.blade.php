@@ -6,7 +6,7 @@
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
-            <!-- Success Message with Timeout -->
+            <!-- Success Message -->
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
                     {{ session('success') }}
@@ -14,19 +14,29 @@
                 </div>
             @endif
 
+            <!-- Error Message -->
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" id="error-alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            <!-- Validation Errors -->
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" id="validation-alert">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Grades List</h5>
-
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
 
                     <!-- Table with stripped rows -->
                     <table class="table datatable">
@@ -222,14 +232,23 @@
     </div>
 </section>
 
-<!-- Add this script at the bottom of your view -->
 @push('scripts')
 <script>
-    // Auto-hide success message after 3 seconds
     $(document).ready(function() {
+        // Auto-hide success message
         setTimeout(function() {
             $("#success-alert").fadeOut('slow');
-        }, 3000);
+        }, 2500); // 2.5 seconds
+
+        // Auto-hide error message
+        setTimeout(function() {
+            $("#error-alert").fadeOut('slow');
+        }, 2500);
+
+        // Auto-hide validation errors
+        setTimeout(function() {
+            $("#validation-alert").fadeOut('slow');
+        }, 2500);
     });
 </script>
 @endpush

@@ -34,18 +34,24 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'student_id' => 'required|string|unique:students,student_id',
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:students,email',
-            'course' => 'required|string|max:255',
-            'year_level' => 'required|integer|min:1|max:4',
-        ]);
+        try {
+            $validated = $request->validate([
+                'student_id' => 'required|unique:students,student_id',
+                'name' => 'required',
+                'email' => 'required|email|unique:students,email',
+                'course' => 'required',
+                'year_level' => 'required|in:1,2,3,4'
+            ]);
 
-        Student::create($validated);
+            Student::create($validated);
 
-        return redirect()->route('admin.students.index')
-            ->with('success', 'Student created successfully.');
+            return redirect()->route('admin.students.index')
+                ->with('success', 'Student created successfully.');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to create student.');
+        }
     }
 
     /**
@@ -69,18 +75,24 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        $validated = $request->validate([
-            'student_id' => 'required|string|unique:students,student_id,' . $student->id,
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:students,email,' . $student->id,
-            'course' => 'required|string|max:255',
-            'year_level' => 'required|integer|min:1|max:4',
-        ]);
+        try {
+            $validated = $request->validate([
+                'student_id' => 'required|unique:students,student_id,' . $student->id,
+                'name' => 'required',
+                'email' => 'required|email|unique:students,email,' . $student->id,
+                'course' => 'required',
+                'year_level' => 'required|in:1,2,3,4'
+            ]);
 
-        $student->update($validated);
+            $student->update($validated);
 
-        return redirect()->route('admin.students.index')
-            ->with('success', 'Student updated successfully.');
+            return redirect()->route('admin.students.index')
+                ->with('success', 'Student updated successfully.');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to update student.');
+        }
     }
 
     /**
@@ -88,10 +100,15 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        $student->delete();
+        try {
+            $student->delete();
 
-        return redirect()->route('admin.students.index')
-            ->with('success', 'Student deleted successfully.');
+            return redirect()->route('admin.students.index')
+                ->with('success', 'Student deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.students.index')
+                ->with('error', 'Failed to delete student.');
+        }
     }
 
     public function search(Request $request)
