@@ -127,7 +127,24 @@
                                         <th scope="row"><a href="#">#{{ $student->id }}</a></th>
                                         <td>{{ $student->name }}</td> 
                                         <td>{{ $student->course }}</td>
-                                        <td>{{ $student->year_level }}</td>
+                                        <td>
+                                            @switch($student->year_level)
+                                                @case(1)
+                                                    First Year
+                                                    @break
+                                                @case(2)
+                                                    Second Year
+                                                    @break
+                                                @case(3)
+                                                    Third Year
+                                                    @break
+                                                @case(4)
+                                                    Fourth Year
+                                                    @break
+                                                @default
+                                                    {{ $student->year_level }}
+                                            @endswitch
+                                        </td>
                                         <td><span class="badge bg-success">Active</span></td>
                                     </tr>
                                     @endforeach

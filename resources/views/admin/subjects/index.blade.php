@@ -36,7 +36,19 @@
                                 <td>{{ $subject->code }}</td>
                                 <td>{{ $subject->name }}</td>
                                 <td>{{ $subject->units }}</td>
-                                <td>{{ $subject->semester }}</td>
+                                <td>@switch($subject->semester)
+                                        @case(1)
+                                            First Semester
+                                            @break
+                                        @case(2)
+                                            Second Semester
+                                            @break
+                                        @case(3)
+                                            Summer
+                                            @break
+                                        @default
+                                            {{ $subject->semester }}
+                                    @endswitch
                                 <td>
                                     <a href="{{ route('admin.subjects.edit', $subject->id) }}" class="btn btn-primary btn-sm">
                                         <i class="bi bi-pencil"></i>

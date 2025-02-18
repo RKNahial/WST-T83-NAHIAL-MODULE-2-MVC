@@ -37,13 +37,19 @@
                                 <td>{{ $enrollment->student->name }}</td>
                                 <td>{{ $enrollment->subject->name }} ({{ $enrollment->subject->code }})</td>
                                 <td>
-                                    @if($enrollment->semester == 1)
-                                        First Semester
-                                    @elseif($enrollment->semester == 2)
-                                        Second Semester
-                                    @else
-                                        Summer
-                                    @endif
+                                    @switch($enrollment->semester)
+                                        @case(1)
+                                            First Semester
+                                            @break
+                                        @case(2)
+                                            Second Semester
+                                            @break
+                                        @case(3)
+                                            Summer
+                                            @break
+                                        @default
+                                            {{ $enrollment->semester }}
+                                    @endswitch
                                 </td>
                                 <td>{{ $enrollment->academic_year }}</td>
                                 <td>

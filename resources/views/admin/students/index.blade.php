@@ -48,7 +48,24 @@
                                 <td>{{ $student->name }}</td>
                                 <td>{{ $student->email }}</td>
                                 <td>{{ $student->course }}</td>
-                                <td>{{ $student->year_level }}</td>
+                                <td>
+                                    @switch($student->year_level)
+                                        @case(1)
+                                            First Year
+                                            @break
+                                        @case(2)
+                                            Second Year
+                                            @break
+                                        @case(3)
+                                            Third Year
+                                            @break
+                                        @case(4)
+                                            Fourth Year
+                                            @break
+                                        @default
+                                            {{ $student->year_level }}
+                                    @endswitch
+                                </td>
                                 <td>
                                     <a href="{{ route('admin.students.edit', $student->id) }}" class="btn btn-sm btn-primary">
                                         <i class="bi bi-pencil"></i>
