@@ -45,7 +45,6 @@ class EnrollmentController extends Controller
         $validated = $request->validate([
             'student_input' => 'required|string',
             'subject_id' => 'required|exists:subjects,id',
-            'semester' => 'required|in:1,2,3',
             'academic_year' => 'required|string',
             'status' => 'required|in:enrolled,dropped,completed'
         ]);
@@ -62,11 +61,14 @@ class EnrollmentController extends Controller
                     ->withErrors(['student_input' => 'Student not found. Please add the student first before enrolling.']);
             }
 
-            // Create the enrollment
+            // Get the subject and its semester
+            $subject = Subject::find($validated['subject_id']);
+
+            // Create the enrollment with subject's semester
             Enrollment::create([
                 'student_id' => $student->id,
                 'subject_id' => $validated['subject_id'],
-                'semester' => $validated['semester'],
+                'semester' => $subject->semester,  // Get semester directly from subject
                 'academic_year' => $validated['academic_year'],
                 'status' => $validated['status']
             ]);
@@ -74,14 +76,12 @@ class EnrollmentController extends Controller
             return redirect()->route('admin.enrollments.index')
                 ->with('success', 'Enrollment created successfully.');
         } catch (\Exception $e) {
-            // Check if the error is due to duplicate enrollment
             if (str_contains($e->getMessage(), 'Duplicate entry') && str_contains($e->getMessage(), 'unique')) {
                 return back()
                     ->withInput()
-                    ->withErrors(['error' => 'This student is already enrolled in this subject. Please choose another subject.']);
+                    ->withErrors(['error' => 'This student is already enrolled in this subject for the selected semester and academic year.']);
             }
 
-            // For other errors
             return back()
                 ->withInput()
                 ->withErrors(['error' => 'Failed to create enrollment. ' . $e->getMessage()]);
@@ -114,7 +114,6 @@ class EnrollmentController extends Controller
     public function update(Request $request, Enrollment $enrollment)
     {
         $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
             'subject_id' => 'required|exists:subjects,id',
             'semester' => 'required|in:1,2,3',
             'academic_year' => 'required|string',
@@ -123,10 +122,12 @@ class EnrollmentController extends Controller
 
         try {
             $enrollment->update($validated);
+
             return redirect()->route('admin.enrollments.index')
                 ->with('success', 'Enrollment updated successfully');
         } catch (\Exception $e) {
-            return back()->withInput()
+            return back()
+                ->withInput()
                 ->withErrors(['error' => 'Failed to update enrollment. ' . $e->getMessage()]);
         }
     }

@@ -36,38 +36,27 @@
                         </div>
 
                         <!-- Subject Selection -->
-                        <div class="col-12">
+                        <div class="col-md-4">
                             <label for="subject_id" class="form-label">Subject</label>
                             <select class="form-select @error('subject_id') is-invalid @enderror" 
                                 id="subject_id" name="subject_id" required>
                                 <option value="">Select Subject</option>
                                 @foreach($subjects as $subject)
-                                    <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>
-                                        {{ $subject->name }} ({{ $subject->code }}) - {{ $subject->units }} units
+                                    <option value="{{ $subject->id }}" 
+                                        data-semester="{{ $subject->semester }}"
+                                        {{ old('subject_id') == $subject->id ? 'selected' : '' }}>
+                                        {{ $subject->name }} ({{ $subject->code }}) - {{ $subject->units }} units - 
+                                        {{ $subject->semester == 1 ? 'First Semester' : ($subject->semester == 2 ? 'Second Semester' : 'Summer') }}
                                     </option>
                                 @endforeach
                             </select>
                             @error('subject_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <!-- Add hidden semester field -->
+                            <input type="hidden" name="semester" id="semester_input" value="{{ old('semester') }}">
                         </div>
 
-                        <!-- Semester Selection -->
-                        <div class="col-md-4">
-                            <label for="semester" class="form-label">Semester</label>
-                            <select class="form-select @error('semester') is-invalid @enderror" 
-                                id="semester" name="semester" required>
-                                <option value="">Select Semester</option>
-                                <option value="1" {{ old('semester') == '1' ? 'selected' : '' }}>First Semester</option>
-                                <option value="2" {{ old('semester') == '2' ? 'selected' : '' }}>Second Semester</option>
-                                <option value="3" {{ old('semester') == '3' ? 'selected' : '' }}>Summer</option>
-                            </select>
-                            @error('semester')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Academic Year Selection -->
                         <div class="col-md-4">
                             <label for="academic_year" class="form-label">Academic Year</label>
                             <select class="form-select @error('academic_year') is-invalid @enderror" 
@@ -84,7 +73,6 @@
                             @enderror
                         </div>
 
-                        <!-- Status Selection -->
                         <div class="col-md-4">
                             <label for="status" class="form-label">Status</label>
                             <select class="form-select @error('status') is-invalid @enderror" 
@@ -114,42 +102,21 @@
 
 @section('scripts')
 <script>
-    // Initialize Select2 for student selection with search
-    $(document).ready(function() {
-        $('#student_input').select2({
-            theme: 'bootstrap-5',
-            placeholder: 'Type Student ID or Name...',
-            allowClear: true,
-            width: '100%',
-            minimumInputLength: 2,
-            ajax: {
-                url: '{{ route('admin.students.search') }}',
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        search: params.term
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.map(function(student) {
-                            return {
-                                id: student.id,
-                                text: student.student_id + ' - ' + student.name
-                            };
-                        })
-                    };
-                },
-                cache: true
-            }
-        });
+$(document).ready(function() {
+    // Function to update hidden semester field
+    function updateSemester() {
+        var selectedOption = $('#subject_id option:selected');
+        var semester = selectedOption.data('semester');
+        $('#semester_input').val(semester);
+    }
 
-        // Initialize Select2 for subject selection
-        $('#subject_id').select2({
-            theme: 'bootstrap-5',
-            placeholder: 'Select Subject'
-        });
-    });
+    // Update semester when subject changes
+    $('#subject_id').change(updateSemester);
+
+    // Initial update if a subject is already selected
+    if ($('#subject_id').val()) {
+        updateSemester();
+    }
+});
 </script>
 @endsection

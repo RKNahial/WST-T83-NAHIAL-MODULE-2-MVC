@@ -24,50 +24,35 @@
                         @csrf
                         @method('PUT')
 
-                        <!-- Student Input -->
+                        <!-- Student Information (Read-only) -->
                         <div class="col-12">
-                            <label for="student_input" class="form-label">Student ID or Name</label>
-                            <input type="text" class="form-control @error('student_input') is-invalid @enderror" 
-                                id="student_input" name="student_input" 
-                                value="{{ old('student_input', $enrollment->student->student_id . ' - ' . $enrollment->student->name) }}" 
-                                placeholder="Enter Student ID or Full Name" required readonly>
-                            <div class="form-text">Student information cannot be changed in enrollment. Create a new enrollment if needed.</div>
-                            @error('student_input')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <label class="form-label">Student Information</label>
+                            <input type="text" class="form-control" 
+                                value="{{ $enrollment->student->name }} ({{ $enrollment->student->student_id }})" 
+                                readonly disabled>
+                            <div class="form-text">Student information cannot be changed in enrollment.</div>
                         </div>
 
                         <!-- Subject Selection -->
-                        <div class="col-12">
+                        <div class="col-md-4">
                             <label for="subject_id" class="form-label">Subject</label>
                             <select class="form-select @error('subject_id') is-invalid @enderror" 
                                 id="subject_id" name="subject_id" required>
                                 <option value="">Select Subject</option>
                                 @foreach($subjects as $subject)
                                     <option value="{{ $subject->id }}" 
+                                        data-semester="{{ $subject->semester }}"
                                         {{ (old('subject_id', $enrollment->subject_id) == $subject->id) ? 'selected' : '' }}>
-                                        {{ $subject->name }} ({{ $subject->code }}) - {{ $subject->units }} units
+                                        {{ $subject->name }} ({{ $subject->code }}) - {{ $subject->units }} units - 
+                                        {{ $subject->semester == 1 ? 'First Semester' : ($subject->semester == 2 ? 'Second Semester' : 'Summer') }}
                                     </option>
                                 @endforeach
                             </select>
                             @error('subject_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
-
-                        <!-- Semester Selection -->
-                        <div class="col-md-4">
-                            <label for="semester" class="form-label">Semester</label>
-                            <select class="form-select @error('semester') is-invalid @enderror" 
-                                id="semester" name="semester" required>
-                                <option value="">Select Semester</option>
-                                <option value="1" {{ (old('semester', $enrollment->semester) == '1') ? 'selected' : '' }}>First Semester</option>
-                                <option value="2" {{ (old('semester', $enrollment->semester) == '2') ? 'selected' : '' }}>Second Semester</option>
-                                <option value="3" {{ (old('semester', $enrollment->semester) == '3') ? 'selected' : '' }}>Summer</option>
-                            </select>
-                            @error('semester')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <!-- Add hidden semester field -->
+                            <input type="hidden" name="semester" id="semester_input" value="{{ old('semester', $enrollment->semester) }}">
                         </div>
 
                         <!-- Academic Year Selection -->
@@ -114,4 +99,25 @@
         </div>
     </div>
 </section>
+
+@section('scripts')
+<script>
+$(document).ready(function() {
+    // Function to update hidden semester field
+    function updateSemester() {
+        var selectedOption = $('#subject_id option:selected');
+        var semester = selectedOption.data('semester');
+        $('#semester_input').val(semester);
+    }
+
+    // Update semester when subject changes
+    $('#subject_id').change(updateSemester);
+
+    // Initial update if a subject is already selected
+    if ($('#subject_id').val()) {
+        updateSemester();
+    }
+});
+</script>
+@endsection
 @endsection
