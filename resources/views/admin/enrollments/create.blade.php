@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Enroll Student')
+@section('title', 'New Enrollment')
 
 @section('content')
 <section class="section">
@@ -23,19 +23,14 @@
                     <form action="{{ route('admin.enrollments.store') }}" method="POST" class="row g-3">
                         @csrf
 
-                        <!-- Student Selection -->
+                        <!-- Student Input -->
                         <div class="col-12">
-                            <label for="student_id" class="form-label">Student ID or Name</label>
-                            <select class="form-select @error('student_id') is-invalid @enderror" 
-                                id="student_id" name="student_id" required>
-                                <option value="">Type Student ID or Name...</option>
-                                @foreach($students as $student)
-                                    <option value="{{ $student->id }}" data-student-id="{{ $student->student_id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
-                                        {{ $student->student_id }} - {{ $student->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('student_id')
+                            <label for="student_input" class="form-label">Student ID or Name</label>
+                            <input type="text" class="form-control @error('student_input') is-invalid @enderror" 
+                                id="student_input" name="student_input" value="{{ old('student_input') }}" 
+                                placeholder="Enter Student ID or Full Name" required>
+                            <div class="form-text">Enter either student ID or full name. Student must be registered in the system first.</div>
+                            @error('student_input')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -121,7 +116,7 @@
 <script>
     // Initialize Select2 for student selection with search
     $(document).ready(function() {
-        $('#student_id').select2({
+        $('#student_input').select2({
             theme: 'bootstrap-5',
             placeholder: 'Type Student ID or Name...',
             allowClear: true,

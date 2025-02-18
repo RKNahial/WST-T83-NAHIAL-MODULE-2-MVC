@@ -20,7 +20,7 @@ class EnrollmentController extends Controller
             return view('admin.enrollments.index', compact('enrollments'));
         } catch (\Exception $e) {
             \Log::error('Enrollment index error: ' . $e->getMessage());
-            dd($e->getMessage()); // Temporary for debugging
+            dd($e->getMessage()); 
             return back()->with('error', 'An error occurred while loading enrollments.');
         }
     }
@@ -43,7 +43,7 @@ class EnrollmentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
+            'student_input' => 'required|string',
             'subject_id' => 'required|exists:subjects,id',
             'semester' => 'required|in:1,2,3',
             'academic_year' => 'required|string',
@@ -51,11 +51,39 @@ class EnrollmentController extends Controller
         ]);
 
         try {
-            Enrollment::create($validated);
+            // Check if student exists
+            $student = Student::where('student_id', $validated['student_input'])
+                ->orWhere('name', 'LIKE', "%{$validated['student_input']}%")
+                ->first();
+
+            if (!$student) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['student_input' => 'Student not found. Please add the student first before enrolling.']);
+            }
+
+            // Create the enrollment
+            Enrollment::create([
+                'student_id' => $student->id,
+                'subject_id' => $validated['subject_id'],
+                'semester' => $validated['semester'],
+                'academic_year' => $validated['academic_year'],
+                'status' => $validated['status']
+            ]);
+
             return redirect()->route('admin.enrollments.index')
-                ->with('success', 'Enrollment created successfully');
+                ->with('success', 'Enrollment created successfully.');
         } catch (\Exception $e) {
-            return back()->withInput()
+            // Check if the error is due to duplicate enrollment
+            if (str_contains($e->getMessage(), 'Duplicate entry') && str_contains($e->getMessage(), 'unique')) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['error' => 'This student is already enrolled in this subject. Please choose another subject.']);
+            }
+
+            // For other errors
+            return back()
+                ->withInput()
                 ->withErrors(['error' => 'Failed to create enrollment. ' . $e->getMessage()]);
         }
     }
