@@ -13,14 +13,8 @@ class SubjectController extends Controller
      */
     public function index()
     {
-        try {
-            $subjects = Subject::all();
-            return view('admin.subjects.index', compact('subjects'));
-        } catch (\Exception $e) {
-            \Log::error('Subject index error: ' . $e->getMessage());
-            dd($e->getMessage()); // Temporary for debugging
-            return back()->with('error', 'An error occurred while loading subjects.');
-        }
+        $subjects = Subject::all();
+        return view('admin.subjects.index', compact('subjects'));
     }
 
     /**
@@ -36,7 +30,30 @@ class SubjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validated = $request->validate([
+                'subject_code' => 'required|string|unique:subjects,code',
+                'subject_name' => 'required|string|max:255',
+                'units' => 'required|integer|min:1|max:6',
+                'semester' => 'required|in:1,2,3'
+            ]);
+
+            $subject = new Subject();
+            $subject->code = $validated['subject_code'];
+            $subject->name = $validated['subject_name'];
+            $subject->units = $validated['units'];
+            $subject->semester = $validated['semester'];
+            $subject->save();
+
+            return redirect()->route('admin.subjects.index')
+                ->with('success', 'Subject created successfully');
+        } catch (\Exception $e) {
+            \Log::error('Subject creation failed: ' . $e->getMessage());
+            
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to create subject. ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -52,7 +69,8 @@ class SubjectController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $subject = Subject::findOrFail($id);
+        return view('admin.subjects.edit', compact('subject'));
     }
 
     /**
@@ -60,7 +78,31 @@ class SubjectController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $subject = Subject::findOrFail($id);
+            
+            $validated = $request->validate([
+                'subject_code' => 'required|string|unique:subjects,code,' . $id,
+                'subject_name' => 'required|string|max:255',
+                'units' => 'required|integer|min:1|max:6',
+                'semester' => 'required|in:1,2,3'
+            ]);
+
+            $subject->code = $validated['subject_code'];
+            $subject->name = $validated['subject_name'];
+            $subject->units = $validated['units'];
+            $subject->semester = $validated['semester'];
+            $subject->save();
+
+            return redirect()->route('admin.subjects.index')
+                ->with('success', 'Subject updated successfully');
+        } catch (\Exception $e) {
+            \Log::error('Subject update failed: ' . $e->getMessage());
+            
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to update subject. ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -68,6 +110,16 @@ class SubjectController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $subject = Subject::findOrFail($id);
+            $subject->delete();
+
+            return redirect()->route('admin.subjects.index')
+                ->with('success', 'Subject deleted successfully');
+        } catch (\Exception $e) {
+            \Log::error('Subject deletion failed: ' . $e->getMessage());
+            
+            return back()->withErrors(['error' => 'Failed to delete subject. ' . $e->getMessage()]);
+        }
     }
 }

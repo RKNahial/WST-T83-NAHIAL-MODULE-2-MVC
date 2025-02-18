@@ -24,8 +24,8 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Subject Code</th>
                                 <th scope="col">Subject Name</th>
-                                <th scope="col">Description</th>
                                 <th scope="col">Units</th>
+                                <th scope="col">Semester</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
@@ -35,8 +35,8 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $subject->code }}</td>
                                 <td>{{ $subject->name }}</td>
-                                <td>{{ $subject->description }}</td>
                                 <td>{{ $subject->units }}</td>
+                                <td>{{ $subject->semester }}</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editSubjectModal{{ $subject->id }}">
                                         <i class="bi bi-pencil"></i>

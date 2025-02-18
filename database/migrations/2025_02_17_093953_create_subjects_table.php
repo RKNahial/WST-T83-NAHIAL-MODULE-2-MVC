@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('subjects');
+        
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
             $table->string('name');
-            $table->text('description');
             $table->integer('units');
+            $table->integer('semester');
             $table->timestamps();
         });
     }
@@ -24,7 +26,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('subjects');
     }
