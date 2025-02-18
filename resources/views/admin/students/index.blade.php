@@ -46,10 +46,8 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Students List</h5>
-                    
-                    <!-- Add Button -->
-                    <div class="-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1 mt-3 mx-2">
+                        <h5 class="card-title mb-0">Students List</h5>
                         <a href="{{ route('admin.students.create') }}" class="btn btn-primary">
                             <i class="bi bi-plus-circle"></i> Add New Student
                         </a>
@@ -115,25 +113,4 @@
         </div>
     </div>
 </section>
-
-@push('scripts')
-<script>
-    $(document).ready(function() {
-        // Auto-hide success message
-        setTimeout(function() {
-            $("#success-alert").fadeOut('slow');
-        }, 2500); // 2.5 seconds
-
-        // Auto-hide error message
-        setTimeout(function() {
-            $("#error-alert").fadeOut('slow');
-        }, 2500);
-
-        // Auto-hide validation errors
-        setTimeout(function() {
-            $("#validation-alert").fadeOut('slow');
-        }, 2500);
-    });
-</script>
-@endpush
 @endsection

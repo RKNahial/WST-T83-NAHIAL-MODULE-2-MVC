@@ -36,16 +36,14 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Enrollments List</h5>
-                    
-                    <!-- Add Button -->
-                    <div class="-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1 mt-3 mx-2">
+                        <h5 class="card-title mb-0">Enrollments List</h5>
                         <a href="{{ route('admin.enrollments.create') }}" class="btn btn-primary">
-                            <i class="bi bi-plus-circle"></i> New Enrollment
+                            <i class="bi bi-plus-circle"></i> Enroll Student
                         </a>
                     </div>
 
-                    <!-- Table with stripped rows -->
+                    <!-- Table with datatable -->
                     <table class="table datatable">
                         <thead>
                             <tr>
