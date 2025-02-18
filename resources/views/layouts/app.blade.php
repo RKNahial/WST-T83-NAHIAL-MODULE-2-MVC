@@ -28,6 +28,7 @@
 
         <!-- Template Main CSS File -->
         <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     </head>
     <body>
         @include('partials.header')
@@ -52,6 +53,6 @@
         <!-- Template Main JS File -->
         <script src="{{ asset('assets/js/main.js') }}"></script>
 
-        @yield('scripts')
+        @stack('scripts')
     </body>
 </html>

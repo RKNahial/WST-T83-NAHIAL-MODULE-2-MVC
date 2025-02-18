@@ -44,13 +44,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('enrollments', EnrollmentController::class);
 
     // Grades
-    Route::get('/grades', [GradeController::class, 'index'])->name('grades.index');
-    Route::get('/grades/create', [GradeController::class, 'create'])->name('grades.create');
-    Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
-    Route::get('/grades/{grade}', [GradeController::class, 'show'])->name('grades.show');
-    Route::get('/grades/{grade}/edit', [GradeController::class, 'edit'])->name('grades.edit');
-    Route::put('/grades/{grade}', [GradeController::class, 'update'])->name('grades.update');
-    Route::delete('/grades/{grade}', [GradeController::class, 'destroy'])->name('grades.destroy');
+    Route::resource('grades', GradeController::class);
 });
 
 require __DIR__.'/auth.php';

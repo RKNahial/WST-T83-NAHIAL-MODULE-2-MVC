@@ -24,4 +24,12 @@ class Enrollment extends Model
     {
         return $this->belongsTo(Subject::class);
     }
+
+    /**
+     * Get the grade associated with the enrollment.
+     */
+    public function grade()
+    {
+        return $this->hasOne(Grade::class);
+    }
 }

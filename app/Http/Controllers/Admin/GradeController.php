@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Grade;
+use App\Models\Enrollment;
+use Illuminate\Support\Facades\Log;
 
 class GradeController extends Controller
 {
@@ -13,13 +15,11 @@ class GradeController extends Controller
      */
     public function index()
     {
-        try {
-            $grades = Grade::with(['student', 'subject'])->get();
-            return view('admin.grades.index', compact('grades'));
-        } catch (\Exception $e) {
-            \Log::error('Grade index error: ' . $e->getMessage());
-            return back()->with('error', 'An error occurred while loading grades.');
-        }
+        $enrollments = Enrollment::with(['student', 'subject', 'grade'])
+            ->where('status', 'enrolled')
+            ->get();
+        
+        return view('admin.grades.index', compact('enrollments'));
     }
 
     /**
@@ -35,7 +35,31 @@ class GradeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validated = $request->validate([
+                'enrollment_id' => 'required|exists:enrollments,id',
+                'grade' => 'required|numeric|in:1.00,1.25,1.50,1.75,2.00,2.25,2.50,2.75,3.00,5.00'
+            ]);
+
+            $enrollment = Enrollment::findOrFail($validated['enrollment_id']);
+            if ($enrollment->status !== 'enrolled') {
+                return back()->withErrors(['error' => 'Can only add grades to enrolled students.']);
+            }
+
+            if ($enrollment->grade) {
+                return back()->withErrors(['error' => 'Grade already exists for this enrollment.']);
+            }
+
+            Grade::create($validated);
+
+            return redirect()->route('admin.grades.index')
+                ->with('success', 'Grade added successfully.');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to add grade. ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -57,16 +81,41 @@ class GradeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Grade $grade)
     {
-        //
+        try {
+            $validated = $request->validate([
+                'grade' => 'required|numeric|in:1.00,1.25,1.50,1.75,2.00,2.25,2.50,2.75,3.00,5.00'
+            ]);
+
+            $grade->update($validated);
+
+            return redirect()->route('admin.grades.index')
+                ->with('success', 'Grade updated successfully.');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to update grade. ' . $e->getMessage()]);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Grade $grade)
     {
-        //
+        try {
+            $grade->delete();
+            
+            return redirect()->route('admin.grades.index')
+                ->with('success', 'Grade deleted successfully.');
+            
+        } catch (\Exception $e) {
+            Log::error('Error deleting grade: ' . $e->getMessage());
+            
+            return redirect()->route('admin.grades.index')
+                ->with('error', 'Failed to delete grade.');
+        }
     }
 }

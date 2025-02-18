@@ -6,19 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up()
     {
         Schema::create('grades', function (Blueprint $table) {
             $table->id();
             $table->foreignId('enrollment_id')->constrained()->onDelete('cascade');
-            $table->decimal('midterm', 5, 2)->nullable();
-            $table->decimal('finals', 5, 2)->nullable();
-            $table->decimal('final_grade', 5, 2)->nullable();
-            // $table->string('remarks')->nullable();
+            $table->decimal('grade', 3, 2);
+            $table->text('remarks')->nullable();
             $table->timestamps();
+            
+            // Ensure one grade per enrollment
+            $table->unique('enrollment_id');
         });
     }
 
