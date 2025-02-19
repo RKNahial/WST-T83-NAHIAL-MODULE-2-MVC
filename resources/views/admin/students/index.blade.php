@@ -93,13 +93,13 @@
                                     @endswitch
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.students.edit', $student->id) }}" class="btn btn-sm btn-primary">
+                                    <a href="{{ route('admin.students.edit', $student->id) }}" class="btn btn-primary btn-sm">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <form action="{{ route('admin.students.destroy', $student->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this student?')">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
