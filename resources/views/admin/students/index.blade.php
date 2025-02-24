@@ -18,8 +18,15 @@
         <div class="col-lg-12">
             <!-- Success Message -->
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
+                    @if(session('temp_password'))
+                        <div class="mt-2 p-2 bg-light border rounded">
+                            <strong>Important!</strong>
+                            <div class="text-monospace">{{ session('temp_password') }}</div>
+                            <small class="text-muted">Please save this password or share it with the student securely.</small>
+                        </div>
+                    @endif
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif

@@ -10,6 +10,30 @@
                 <div class="card-body">
                     <h5 class="card-title">Add New Student</h5>
 
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" id="successAlert" role="alert">
+                            <strong>{{ session('success') }}</strong>
+                            <hr>
+                            <p class="mb-0">Temporary Password: <strong id="tempPassword">{{ session('temp_password') }}</strong></p>
+                            <p class="mb-0 text-danger">Please copy this password now! This message will disappear in <span id="countdown">10</span> seconds.</p>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" onclick="copyPassword()">Copy Password</button>
+                                <a href="{{ route('admin.students.index') }}" class="btn btn-secondary">Go to Students List</a>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form action="{{ route('admin.students.store') }}" method="POST">
                         @csrf
 
@@ -75,4 +99,55 @@
         </div>
     </div>
 </section>
+
+@if(session('success'))
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Countdown timer
+    let timeLeft = 10;
+    const countdownElement = document.getElementById('countdown');
+    const alertElement = document.getElementById('successAlert');
+
+    const timer = setInterval(function() {
+        timeLeft--;
+        countdownElement.textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            alertElement.style.display = 'none';
+        }
+    }, 1000);
+
+    // Copy password functionality
+    const tempPasswordElement = document.getElementById('tempPassword');
+    tempPasswordElement.addEventListener('click', function() {
+        const password = this.textContent;
+        navigator.clipboard.writeText(password).then(function() {
+            alert('Password copied to clipboard!');
+        });
+    });
+});
+
+function copyPassword() {
+    const password = document.getElementById('tempPassword').textContent;
+    navigator.clipboard.writeText(password).then(function() {
+        alert('Password copied to clipboard!');
+    });
+}
+</script>
+
+<style>
+#tempPassword {
+    cursor: pointer;
+    background-color: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+#tempPassword:hover {
+    background-color: #e9ecef;
+}
+</style>
+@endif
+
 @endsection
