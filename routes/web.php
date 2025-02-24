@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\Admin\GradeController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,6 +46,22 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Grades
     Route::resource('grades', GradeController::class);
+});
+
+Route::middleware(['auth'])->prefix('student')->name('student.')->group(function () {
+    Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
+    
+    // Grades
+    Route::get('/grades', [App\Http\Controllers\Student\GradeController::class, 'index'])->name('grades');
+    
+    // Schedule
+    Route::get('/schedule', [App\Http\Controllers\Student\ScheduleController::class, 'index'])->name('schedule');
+    
+    // Assignments
+    Route::get('/assignments', [App\Http\Controllers\Student\AssignmentController::class, 'index'])->name('assignments');
+    
+    // Attendance
+    Route::get('/attendance', [App\Http\Controllers\Student\AttendanceController::class, 'index'])->name('attendance');
 });
 
 require __DIR__.'/auth.php';
