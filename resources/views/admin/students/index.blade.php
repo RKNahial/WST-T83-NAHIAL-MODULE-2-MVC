@@ -120,4 +120,24 @@
         </div>
     </div>
 </section>
+
+@if(session('success'))
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const alert = document.getElementById('successAlert');
+        if (alert) {
+            // Add fade out effect
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            
+            // Remove the element after fade out
+            setTimeout(function() {
+                alert.remove();
+            }, 500);
+        }
+    }, 2500); 
+});
+</script>
+@endif
 @endsection

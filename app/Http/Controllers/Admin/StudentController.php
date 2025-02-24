@@ -99,23 +99,38 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $student->user_id . ',id',
+            'student_id' => 'required|unique:users,student_id,' . $student->user_id . ',id',
+            'course' => 'required',
+            'year_level' => 'required'
+        ]);
+
         try {
-            $validated = $request->validate([
-                'student_id' => 'required|unique:students,student_id,' . $student->id,
-                'name' => 'required',
-                'email' => 'required|email|unique:students,email,' . $student->id,
-                'course' => 'required',
-                'year_level' => 'required|in:1,2,3,4'
+            // Update user information
+            $student->user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'student_id' => $request->student_id,
             ]);
 
-            $student->update($validated);
+            // Update student information
+            $student->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'student_id' => $request->student_id,
+                'course' => $request->course,
+                'year_level' => $request->year_level
+            ]);
 
             return redirect()->route('admin.students.index')
-                ->with('success', 'Student updated successfully.');
+                ->with('success', 'Student updated successfully!');
+
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->with('error', 'Failed to update student.');
+                ->withErrors(['error' => 'Failed to update student. ' . $e->getMessage()]);
         }
     }
 
