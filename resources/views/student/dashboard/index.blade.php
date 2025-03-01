@@ -47,7 +47,7 @@
                 <div class="col-12">
                     <div class="card recent-sales overflow-auto">
                         <div class="card-body">
-                            <h5 class="card-title">Current Subjects <span>| {{ $currentSemester ?? 'This Semester' }}</span></h5>
+                            <h5 class="card-title">Current Subjects <span>| {{ $currentSemester }}</span></h5>
                             <table class="table table-borderless datatable">
                                 <thead>
                                     <tr>
@@ -59,9 +59,9 @@
                                 <tbody>
                                     @foreach($currentSubjects ?? [] as $subject)
                                     <tr>
-                                        <th scope="row">{{ $subject->code }}</th>
-                                        <td>{{ $subject->name }}</td>
-                                        <td><span class="badge bg-success">{{ $subject->grade ?? 'Ongoing' }}</span></td>
+                                        <th scope="row">{{ $subject['code'] }}</th>
+                                        <td>{{ $subject['name'] }}</td>
+                                        <td><span class="badge bg-success">{{ $subject['grade'] }}</span></td>
                                     </tr>
                                     @endforeach
                                 </tbody>

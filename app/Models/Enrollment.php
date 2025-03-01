@@ -36,4 +36,9 @@ class Enrollment extends Model
     {
         return $this->hasOne(Grade::class);
     }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
+    }
 }
