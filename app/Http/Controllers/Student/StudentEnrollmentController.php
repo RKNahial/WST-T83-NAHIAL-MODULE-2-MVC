@@ -33,19 +33,17 @@ class StudentEnrollmentController extends Controller
 
     public function history()
     {
-        $user = auth()->user();
+        $student = auth()->user()->student;
         
-        if (!$user || !$user->student) {
-            return redirect()->route('login')
-                ->with('error', 'Please login as a student to access this page.');
-        }
-
-        $enrollmentHistory = Enrollment::where('student_id', $user->student->id)
-            ->where('semester', '!=', 'current')
-            ->with('subjects')
-            ->orderBy('created_at', 'desc')
+        // Load enrollments with their relationships
+        $enrollmentHistory = Enrollment::where('student_id', $student->id)
+            ->with(['subject', 'grade']) // Use the correct relationship names
+            ->orderBy('academic_year', 'desc')
+            ->orderBy('semester', 'desc')
             ->get();
 
-        return view('student.enrollment.history', compact('enrollmentHistory'));
+        return view('student.enrollment.history', [
+            'enrollmentHistory' => $enrollmentHistory
+        ]);
     }
 }
