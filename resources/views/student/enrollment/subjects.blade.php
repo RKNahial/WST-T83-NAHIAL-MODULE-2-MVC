@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Current Subjects')
+@section('title', 'All Subjects')
 
 @section('content')
 <section class="section">
@@ -8,7 +8,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Current Semester Subjects</h5>
+                    <h5 class="card-title">All Subjects</h5>
 
                     <!-- Filters -->
                     <div class="row mb-3">
