@@ -11,30 +11,24 @@ class StudentEnrollmentController extends Controller
 {
     public function subjects()
     {
-        $user = auth()->user();
+        $student = auth()->user()->student;
         
-        if (!$user || !$user->student) {
-            return redirect()->route('login')
-                ->with('error', 'Please login as a student to access this page.');
-        }
+        // Get all enrollments
+        $enrolledSubjects = Enrollment::where('student_id', $student->id)
+            ->with(['subject', 'grade'])
+            ->get();
 
-        $currentEnrollment = Enrollment::where('student_id', $user->student->id)
-            ->where('semester', 'current')
-            ->first();
+        // Get unique academic years for the filter
+        $academicYears = Enrollment::where('student_id', $student->id)
+            ->distinct()
+            ->pluck('academic_year')
+            ->sort()
+            ->values();
 
-        $enrolledSubjects = [];
-        $totalUnits = 0;
-
-        if ($currentEnrollment) {
-            $enrolledSubjects = $currentEnrollment->subjects;
-            $totalUnits = $enrolledSubjects->sum('units');
-        }
-
-        return view('student.enrollment.subjects', compact(
-            'currentEnrollment',
-            'enrolledSubjects',
-            'totalUnits'
-        ));
+        return view('student.enrollment.subjects', [
+            'enrolledSubjects' => $enrolledSubjects,
+            'academicYears' => $academicYears
+        ]);
     }
 
     public function history()

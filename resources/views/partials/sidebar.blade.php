@@ -67,7 +67,7 @@
                 <a class="nav-link {{ request()->routeIs('student.enrollment.subjects') ? '' : 'collapsed' }}" 
                    href="{{ route('student.enrollment.subjects') }}">
                     <i class="bi bi-journal-text"></i>
-                    <span>Current Subjects</span>
+                    <span>Subjects</span>
                 </a>
             </li>
 
