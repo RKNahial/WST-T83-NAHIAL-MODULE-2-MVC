@@ -36,7 +36,35 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Grades List</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-1 mt-3 mx-2">
+                        <h5 class="card-title mb-0">Grades List</h5>
+                        <div class="d-flex gap-2 align-items-center">
+                            <!-- Semester Filter -->
+                            <select id="semesterFilter" class="form-select" style="width: auto;">
+                                <option value="">All Semesters</option>
+                                <option value="First Semester">First Semester</option>
+                                <option value="Second Semester">Second Semester</option>
+                                <option value="Summer">Summer</option>
+                            </select>
+
+                            <!-- Academic Year Filter -->
+                            <select id="yearFilter" class="form-select" style="width: auto;">
+                                <option value="">All Years</option>
+                                @php
+                                    $currentYear = 2024;  // Starting from 2024
+                                    $endYear = $currentYear + 2;  // Will show up to 2026
+                                @endphp
+                                @for($year = $currentYear; $year <= $endYear; $year++)
+                                    <option value="{{ $year }}-{{ $year + 1 }}">{{ $year }}-{{ $year + 1 }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- No Results Message -->
+                    <div id="noResults" class="alert alert-info" style="display: none;">
+                        No grades found for the selected filters.
+                    </div>
 
                     <!-- Table with stripped rows -->
                     <table class="table datatable">
@@ -234,20 +262,62 @@
 
 @push('scripts')
 <script>
-    $(document).ready(function() {
-        // Auto-hide success message
-        setTimeout(function() {
-            $("#success-alert").fadeOut('slow');
-        }, 2500); // 2.5 seconds
+    document.addEventListener("DOMContentLoaded", function() {
+        // Filter function
+        function filterRows() {
+            const semesterFilter = document.getElementById('semesterFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
 
-        // Auto-hide error message
-        setTimeout(function() {
-            $("#error-alert").fadeOut('slow');
-        }, 2500);
+            // Get all rows
+            const rows = document.querySelectorAll('.datatable tbody tr');
+            let visibleRows = 0;
 
-        // Auto-hide validation errors
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                const semester = cells[4].textContent.trim(); // Adjust index based on your semester column
+                const year = cells[5].textContent.trim(); // Adjust index based on your academic year column
+
+                const semesterMatch = !semesterFilter || semester.includes(semesterFilter);
+                const yearMatch = !yearFilter || year === yearFilter;
+
+                const isVisible = semesterMatch && yearMatch;
+                row.classList.toggle('hide', !isVisible);
+                
+                if (isVisible) {
+                    visibleRows++;
+                }
+            });
+
+            // Show/hide no results message
+            const noResultsMessage = document.getElementById('noResults');
+            const tableElement = document.querySelector('.datatable');
+            
+            if (visibleRows === 0) {
+                noResultsMessage.style.display = 'block';
+                tableElement.style.display = 'none';
+            } else {
+                noResultsMessage.style.display = 'none';
+                tableElement.style.display = 'table';
+            }
+        }
+
+        // Event listeners for filters
+        document.getElementById('semesterFilter').addEventListener('change', filterRows);
+        document.getElementById('yearFilter').addEventListener('change', filterRows);
+
+        // Add CSS for hidden rows
+        const style = document.createElement('style');
+        style.textContent = '.hide { display: none !important; }';
+        document.head.appendChild(style);
+
+        // Auto-hide alerts
         setTimeout(function() {
-            $("#validation-alert").fadeOut('slow');
+            const alerts = document.querySelectorAll("#success-alert, #error-alert, #validation-alert");
+            alerts.forEach(alert => {
+                if(alert) {
+                    alert.style.display = 'none';
+                }
+            });
         }, 2500);
     });
 </script>

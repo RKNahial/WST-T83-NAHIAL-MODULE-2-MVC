@@ -38,9 +38,25 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-1 mt-3 mx-2">
                         <h5 class="card-title mb-0">Subject List</h5>
-                        <a href="{{ route('admin.subjects.create') }}" class="btn btn-primary">
-                            <i class="bi bi-plus-circle"></i> Add New Subject
-                        </a>
+                        <div class="d-flex gap-2 align-items-center">
+                            <!-- Semester Filter -->
+                            <select id="semesterFilter" class="form-select" style="width: auto;">
+                                <option value="">All Semesters</option>
+                                <option value="First Semester">First Semester</option>
+                                <option value="Second Semester">Second Semester</option>
+                                <option value="Summer">Summer</option>
+                            </select>
+                            
+                            <!-- Add New Subject Button -->
+                            <a href="{{ route('admin.subjects.create') }}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Add New Subject
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- No Results Message -->
+                    <div id="noResults" class="alert alert-info" style="display: none;">
+                        No subjects found for the selected semester.
                     </div>
 
                     <!-- Table with datatable -->
@@ -99,19 +115,54 @@
 
 @push('scripts')
 <script>
-    $(document).ready(function() {
-        // Auto-hide success message
+    document.addEventListener("DOMContentLoaded", function() {
+        // Filter function
+        function filterRows() {
+            const semesterFilter = document.getElementById('semesterFilter').value;
+
+            // Get all rows
+            const rows = document.querySelectorAll('.datatable tbody tr');
+            let visibleRows = 0;
+
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                const semester = cells[4].textContent.trim(); // Adjust index based on your semester column
+
+                const semesterMatch = !semesterFilter || semester === semesterFilter;
+
+                const isVisible = semesterMatch;
+                row.classList.toggle('hide', !isVisible);
+                
+                if (isVisible) {
+                    visibleRows++;
+                }
+            });
+
+            // Show/hide no results message
+            const noResultsMessage = document.getElementById('noResults');
+            const tableElement = document.querySelector('.datatable');
+            
+            if (visibleRows === 0) {
+                noResultsMessage.style.display = 'block';
+                tableElement.style.display = 'none';
+            } else {
+                noResultsMessage.style.display = 'none';
+                tableElement.style.display = 'table';
+            }
+        }
+
+        // Event listener for filter
+        document.getElementById('semesterFilter').addEventListener('change', filterRows);
+
+        // Add CSS for hidden rows
+        const style = document.createElement('style');
+        style.textContent = '.hide { display: none !important; }';
+        document.head.appendChild(style);
+
+        // Auto-hide alerts
         setTimeout(function() {
             $("#success-alert").fadeOut('slow');
-        }, 2500); // 2.5 seconds
-
-        // Auto-hide error message
-        setTimeout(function() {
             $("#error-alert").fadeOut('slow');
-        }, 2500);
-
-        // Auto-hide validation errors
-        setTimeout(function() {
             $("#validation-alert").fadeOut('slow');
         }, 2500);
     });
