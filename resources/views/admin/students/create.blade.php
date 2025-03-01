@@ -115,6 +115,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (timeLeft <= 0) {
             clearInterval(timer);
             alertElement.style.display = 'none';
+            
+            // Set a timeout to redirect after the alert disappears
+            setTimeout(function() {
+                window.location.href = "{{ route('admin.students.index') }}";
+            }, 2500); // 2.5 seconds after the alert disappears
         }
     }, 1000);
 
