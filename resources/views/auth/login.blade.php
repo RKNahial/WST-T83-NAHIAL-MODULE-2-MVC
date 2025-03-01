@@ -49,6 +49,32 @@
             font-family: "Nunito", sans-serif;
             margin-bottom: 0;
         }
+
+        /* Error Message Styling */
+        .invalid-feedback, 
+        .text-danger,
+        .mt-2 {  /* This targets the x-input-error messages */
+            color: #dc3545 !important;
+            font-size: 0.75rem !important;  
+            margin-top: 0.25rem !important;
+            display: block;
+            list-style-type: none !important;  
+            padding-left: 0 !important;  
+        }
+ 
+        .invalid-feedback ul,
+        .text-danger ul,
+        .mt-2 ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .invalid-feedback li,
+        .text-danger li,
+        .mt-2 li {
+            list-style: none;
+        }
     </style>
 </head>
 

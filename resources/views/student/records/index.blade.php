@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'GWA Summary')
+@section('title', 'Grades')
 
 @section('content')
 <section class="section">

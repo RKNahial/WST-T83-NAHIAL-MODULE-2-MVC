@@ -19,7 +19,7 @@
                 <a class="nav-link {{ request()->routeIs('admin.students.*') ? '' : 'collapsed' }}" 
                    href="{{ route('admin.students.index') }}">
                     <i class="bi bi-people"></i>
-                    <span>Students</span>
+                    <span>Student</span>
                 </a>
             </li>
 
@@ -28,7 +28,7 @@
                 <a class="nav-link {{ request()->routeIs('admin.subjects.*') ? '' : 'collapsed' }}" 
                    href="{{ route('admin.subjects.index') }}">
                     <i class="bi bi-journal-text"></i>
-                    <span>Subjects</span>
+                    <span>Subject</span>
                 </a>
             </li>
 
@@ -37,7 +37,7 @@
                 <a class="nav-link {{ request()->routeIs('admin.enrollments.*') ? '' : 'collapsed' }}" 
                    href="{{ route('admin.enrollments.index') }}">
                     <i class="bi bi-person-check"></i>
-                    <span>Enrollments</span>
+                    <span>Enrollment</span>
                 </a>
             </li>
 
@@ -76,7 +76,7 @@
                 <a class="nav-link {{ request()->routeIs('student.records.index') ? '' : 'collapsed' }}" 
                    href="{{ route('student.records.index') }}">
                     <i class="bi bi-graph-up"></i>
-                    <span>GWA Summary</span>
+                    <span>Grades</span>
                 </a>
             </li>
         @endif

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Subjects')
+@section('title', 'Subject')
 
 @section('content')
 <section class="section">
@@ -37,7 +37,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-1 mt-3 mx-2">
-                        <h5 class="card-title mb-0">Subjects List</h5>
+                        <h5 class="card-title mb-0">Subject List</h5>
                         <a href="{{ route('admin.subjects.create') }}" class="btn btn-primary">
                             <i class="bi bi-plus-circle"></i> Add New Subject
                         </a>
