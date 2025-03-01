@@ -59,9 +59,15 @@
                                 <tbody>
                                     @foreach($currentSubjects ?? [] as $subject)
                                     <tr>
-                                        <th scope="row">{{ $subject['code'] }}</th>
-                                        <td>{{ $subject['name'] }}</td>
-                                        <td><span class="badge bg-success">{{ $subject['grade'] }}</span></td>
+                                        <th scope="row">{{ $subject->subject->code }}</th>
+                                        <td>{{ $subject->subject->name }}</td>
+                                        <td>
+                                            @if($subject->grade)
+                                                <span class="badge bg-success">{{ number_format($subject->grade->grade, 2) }}</span>
+                                            @else
+                                                <span class="badge bg-warning">No grade yet</span>
+                                            @endif
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>

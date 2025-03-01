@@ -8,55 +8,65 @@ use App\Models\Enrollment;
 use App\Models\Subject;
 use App\Models\Grade;
 use Illuminate\Support\Facades\DB;
+use App\Models\Setting;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Get the authenticated student
         $student = auth()->user()->student;
         
-        // Get current enrollments with subjects and grades
+        // Get current academic year and semester from settings
+        $currentAcademicYear = Setting::where('name', 'current_academic_year')->first()->value ?? '2023-2024';
+        $currentSemester = Setting::where('name', 'current_semester')->first()->value ?? 1;
+
+        // Get current semester subjects
         $currentSubjects = Enrollment::where('student_id', $student->id)
-            ->where('status', 'enrolled')
+            ->where('academic_year', $currentAcademicYear)
+            ->where('semester', $currentSemester)
             ->with(['subject', 'grade'])
-            ->get()
-            ->map(function ($enrollment) {
-                return [
-                    'code' => $enrollment->subject->code,
-                    'name' => $enrollment->subject->name,
-                    'grade' => $enrollment->grade ? $enrollment->grade->grade : 'Ongoing'
-                ];
-            });
-
-        // Calculate total enrolled subjects
-        $totalEnrolledSubjects = $currentSubjects->count();
-
-        // Get enrollments with grades
-        $enrollments = Enrollment::where('student_id', $student->id)
-            ->whereIn('status', ['enrolled', 'completed'])
-            ->with('grade')
             ->get();
 
-        // Calculate GPA
-        $gradesSum = 0;
-        $gradesCount = 0;
+        // Calculate current semester GWA
+        $totalGrades = 0;
+        $gradeCount = 0;
 
-        foreach ($enrollments as $enrollment) {
-            if ($enrollment->grade) {
-                $gradesSum += $enrollment->grade->grade;
-                $gradesCount++;
+        foreach ($currentSubjects as $enrollment) {
+            if ($enrollment->grade && is_numeric($enrollment->grade->grade)) {
+                $grade = $enrollment->grade->grade;
+                
+                // Only include valid grades (not failed or incomplete)
+                if ($grade > 0 && $grade <= 5.0) {
+                    $totalGrades += $grade;
+                    $gradeCount++;
+                }
             }
         }
 
-        // Calculate GPA
-        $gpa = $gradesCount > 0 ? number_format($gradesSum / $gradesCount, 2) : '0.00';
+        // Calculate simple average of grades
+        $currentGWA = $gradeCount > 0 
+            ? number_format($totalGrades / $gradeCount, 2) 
+            : '0.00';
 
         return view('student.dashboard.index', [
+            'totalEnrolledSubjects' => $currentSubjects->count(),
+            'GWA' => $currentGWA,
             'currentSubjects' => $currentSubjects,
-            'totalEnrolledSubjects' => $totalEnrolledSubjects,
-            'gpa' => $gpa,
-            'currentSemester' => 'Current Semester'
+            'currentSemester' => $this->getSemesterText($currentSemester) . ' ' . $currentAcademicYear
         ]);
+    }
+
+    private function getSemesterText($semester)
+    {
+        switch ($semester) {
+            case 1:
+                return 'First Semester';
+            case 2:
+                return 'Second Semester';
+            case 3:
+                return 'Summer';
+            default:
+                return '';
+        }
     }
 }
