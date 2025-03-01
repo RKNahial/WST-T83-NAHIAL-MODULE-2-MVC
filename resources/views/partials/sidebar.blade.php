@@ -56,61 +56,43 @@
                 <a class="nav-link {{ request()->routeIs('student.dashboard') ? '' : 'collapsed' }}" 
                    href="{{ route('student.dashboard') }}">
                     <i class="bi bi-grid"></i>
-                    <span>Student Dashboard</span>
+                    <span>Dashboard</span>
                 </a>
             </li>
 
             <li class="nav-heading">Student Pages</li>
 
-            <!-- Academic Records Nav -->
+            <!-- Current Subjects -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('student.records.*') ? '' : 'collapsed' }}"
-                   data-bs-target="#academic-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-mortarboard"></i>
-                    <span>Academic Records</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link {{ request()->routeIs('student.enrollment.subjects') ? '' : 'collapsed' }}" 
+                   href="{{ route('student.enrollment.subjects') }}">
+                    <i class="bi bi-journal-text"></i>
+                    <span>Current Subjects</span>
                 </a>
-                <ul id="academic-nav" class="nav-content collapse {{ request()->routeIs('student.records.*') ? 'show' : '' }}" 
-                    data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="{{ route('student.records.index') }}" 
-                           class="{{ request()->routeIs('student.records.index') ? 'active' : '' }}">
-                            <i class="bi bi-circle"></i>
-                            <span>GWA Summary</span>
-                        </a>
-                    </li>
-                </ul>
             </li>
 
-            <!-- Enrollment Records Nav -->
+            <!-- Enrollment History -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('student.enrollment.*') ? '' : 'collapsed' }}" 
-                   data-bs-target="#enrollment-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-journal-text"></i>
-                    <span>My Enrollment</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link {{ request()->routeIs('student.enrollment.history') ? '' : 'collapsed' }}" 
+                   href="{{ route('student.enrollment.history') }}">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Enrollment History</span>
                 </a>
-                <ul id="enrollment-nav" class="nav-content collapse {{ request()->routeIs('student.enrollment.*') ? 'show' : '' }}" 
-                    data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="{{ route('student.enrollment.subjects') }}" 
-                           class="{{ request()->routeIs('student.enrollment.subjects') ? 'active' : '' }}">
-                            <i class="bi bi-circle"></i>
-                            <span>Current Subjects</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('student.enrollment.history') }}" 
-                           class="{{ request()->routeIs('student.enrollment.history') ? 'active' : '' }}">
-                            <i class="bi bi-circle"></i>
-                            <span>Enrollment History</span>
-                        </a>
-                    </li>
-                </ul>
+            </li>
+
+            <!-- GWA Summary -->
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('student.records.index') ? '' : 'collapsed' }}" 
+                   href="{{ route('student.records.index') }}">
+                    <i class="bi bi-graph-up"></i>
+                    <span>GWA Summary</span>
+                </a>
             </li>
         @endif
 
         <!-- Common Navigation Items for Both Roles -->
+        <li class="nav-heading">Account Settings</li>
+        
         <!-- Profile Nav -->
         <li class="nav-item">
             <a class="nav-link collapsed" href="{{ route('profile.edit') }}">

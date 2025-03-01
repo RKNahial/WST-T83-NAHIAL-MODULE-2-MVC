@@ -25,18 +25,18 @@
                     </div>
                 </div>
 
-                <!-- GPA Card -->
+                <!-- GWA Card -->
                 <div class="col-xxl-6 col-md-6">
                     <div class="card info-card revenue-card">
                         <div class="card-body">
-                            <h5 class="card-title">GPA</h5>
+                            <h5 class="card-title">GWA</h5>
                             <div class="d-flex align-items-center">
                                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                     <i class="bi bi-graph-up"></i>
                                 </div>
                                 <div class="ps-3">
-                                    <h6>{{ $gpa ?? '0.00' }}</h6>
-                                    <span class="text-muted small pt-2">Current GPA</span>
+                                    <h6>{{ $GWA ?? '0.00' }}</h6>
+                                    <span class="text-muted small pt-2">Current GWA</span>
                                 </div>
                             </div>
                         </div>

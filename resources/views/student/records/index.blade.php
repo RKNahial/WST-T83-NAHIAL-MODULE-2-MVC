@@ -1,82 +1,140 @@
 @extends('layouts.app')
 
-@section('title', 'Academic Records')
+@section('title', 'Curriculum Evaluation')
 
 @section('content')
 <section class="section">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Academic Records</h5>
-
-                    <!-- GWA Summary Card -->
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="card info-card revenue-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Overall GWA</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-graph-up"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ number_format($overallGwa ?? 0, 2) }}</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Curriculum Evaluation</h5>
+                        <div class="alert alert-info mb-0 px-3 py-2">
+                            Overall GWA: {{ $gwa ?? '0.00' }}
                         </div>
                     </div>
 
-                    <!-- Grades per Semester -->
-                    @forelse($semesterGrades ?? [] as $semester => $grades)
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $semester }} Semester</h5>
-                                <div class="mb-3">
-                                    <strong>Semester GWA: </strong>
-                                    {{ number_format($semesterGwa[$semester] ?? 0, 2) }}
-                                </div>
+                    <table class="table datatable">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Subject Code</th>
+                                <th scope="col">Subject Name</th>
+                                <th scope="col">Units</th>
+                                <th scope="col">Pre-requisites</th>
+                                <th scope="col">Grade</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Semester Taken</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php $currentYear = null; $currentSem = null; @endphp
+                            
+                            @foreach($enrollments as $enrollment)
+                                @if($currentYear != $enrollment->academic_year || $currentSem != $enrollment->semester)
+                                    <tr class="table-primary">
+                                        <td colspan="8" class="fw-bold">
+                                            @switch($enrollment->semester)
+                                                @case(1)
+                                                    First Semester
+                                                    @break
+                                                @case(2)
+                                                    Second Semester
+                                                    @break
+                                                @case(3)
+                                                    Summer
+                                                    @break
+                                            @endswitch
+                                            - {{ $enrollment->academic_year }}
+                                        </td>
+                                    </tr>
+                                    @php 
+                                        $currentYear = $enrollment->academic_year;
+                                        $currentSem = $enrollment->semester;
+                                    @endphp
+                                @endif
                                 
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Subject Code</th>
-                                            <th>Description</th>
-                                            <th>Units</th>
-                                            <th>Grade</th>
-                                            <th>Remarks</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($grades as $grade)
-                                            <tr>
-                                                <td>{{ $grade->subject->code }}</td>
-                                                <td>{{ $grade->subject->name }}</td>
-                                                <td>{{ $grade->subject->units }}</td>
-                                                <td>{{ $grade->grade }}</td>
-                                                <td>
-                                                    @if($grade->grade >= 75)
-                                                        <span class="badge bg-success">PASSED</span>
-                                                    @else
-                                                        <span class="badge bg-danger">FAILED</span>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="alert alert-info">
-                            No academic records found.
-                        </div>
-                    @endforelse
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $enrollment->subject->code }}</td>
+                                    <td>{{ $enrollment->subject->name }}</td>
+                                    <td>{{ $enrollment->subject->units }}</td>
+                                    <td>
+                                        @if($enrollment->subject->prerequisites)
+                                            {{ $enrollment->subject->prerequisites }}
+                                        @else
+                                            <span class="text-muted">None</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($enrollment->grade)
+                                            @if($enrollment->grade->grade >= 75)
+                                                <span class="badge bg-success">{{ $enrollment->grade->grade }}</span>
+                                            @else
+                                                <span class="badge bg-danger">{{ $enrollment->grade->grade }}</span>
+                                            @endif
+                                        @else
+                                            <span class="badge bg-warning text-dark">Ongoing</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($enrollment->status == 'enrolled')
+                                            <span class="badge bg-primary">Enrolled</span>
+                                        @elseif($enrollment->status == 'dropped')
+                                            <span class="badge bg-danger">Dropped</span>
+                                        @else
+                                            <span class="badge bg-success">Completed</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ $enrollment->academic_year }} - 
+                                        @switch($enrollment->semester)
+                                            @case(1)
+                                                1st
+                                                @break
+                                            @case(2)
+                                                2nd
+                                                @break
+                                            @case(3)
+                                                Summer
+                                                @break
+                                        @endswitch
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('.datatable').DataTable({
+            "pageLength": 10,
+            "ordering": true,
+            "order": [[7, 'asc']], // Sort by semester taken
+            "drawCallback": function(settings) {
+                // Maintain the semester headers when sorting
+                var api = this.api();
+                var rows = api.rows({page:'current'}).nodes();
+                var last = null;
+                
+                api.column(7, {page:'current'}).data().each(function(group, i) {
+                    if (last !== group) {
+                        $(rows).eq(i).before(
+                            '<tr class="table-primary"><td colspan="8" class="fw-bold">' + group + '</td></tr>'
+                        );
+                        last = group;
+                    }
+                });
+            }
+        });
+    });
+</script>
+@endpush
