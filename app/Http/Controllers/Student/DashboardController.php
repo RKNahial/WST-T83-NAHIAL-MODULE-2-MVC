@@ -13,7 +13,6 @@ class DashboardController extends Controller
         $data = [
             'totalEnrolledSubjects' => 0, // Get from enrollments
             'gpa' => '0.00', // Calculate from grades
-            'attendanceRate' => '0%', // Calculate from attendance records
             'currentSubjects' => [], // Get current semester subjects
         ];
 

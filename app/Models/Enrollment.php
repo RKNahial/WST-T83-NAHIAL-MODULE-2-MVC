@@ -2,24 +2,28 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Enrollment extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'student_id',
         'subject_id',
-        'semester',
         'academic_year',
+        'semester',
         'status'
     ];
 
-    // Relationships
+    // Define relationship with Student
     public function student()
     {
         return $this->belongsTo(Student::class);
     }
 
+    // Define relationship with Subject
     public function subject()
     {
         return $this->belongsTo(Subject::class);

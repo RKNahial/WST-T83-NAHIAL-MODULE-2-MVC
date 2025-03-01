@@ -9,6 +9,9 @@ use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\Admin\GradeController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Student\StudentAcademicController;
+use App\Http\Controllers\Student\StudentEnrollmentController;
+use App\Http\Controllers\Student\StudentRecordsController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -43,10 +46,17 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 // STUDENT ROUTE
 Route::middleware(['auth'])->prefix('student')->name('student.')->group(function () {
+    // Dashboard
     Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
-
-    // Grades
-    Route::get('/grades', [App\Http\Controllers\Student\GradeController::class, 'index'])->name('grades');
+    
+    // Academic Records
+    Route::get('/records', [StudentRecordsController::class, 'index'])->name('records.index');
+    
+    // Enrollment
+    Route::prefix('enrollment')->name('enrollment.')->group(function () {
+        Route::get('/subjects', [StudentEnrollmentController::class, 'subjects'])->name('subjects');
+        Route::get('/history', [StudentEnrollmentController::class, 'history'])->name('history');
+    });
 });
 
 // Regular registration (for admin)

@@ -2,6 +2,7 @@
 <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
 
+        <!-- Admin Navigation -->
         <!-- Dashboard Nav -->
         <li class="nav-item">
             <a class="nav-link {{ request()->routeIs('admin.dashboard') ? '' : 'collapsed' }}" 
@@ -9,9 +10,9 @@
                 <i class="bi bi-grid"></i>
                 <span>Dashboard</span>
             </a>
-        </li><!-- End Dashboard Nav -->
+        </li>
 
-        <li class="nav-heading">Pages</li>
+        <li class="nav-heading">Admin Pages</li>
 
         <!-- Students Nav -->
         <li class="nav-item">
@@ -20,7 +21,7 @@
                 <i class="bi bi-people"></i>
                 <span>Students</span>
             </a>
-        </li><!-- End Students Nav -->
+        </li>
 
         <!-- Subjects Nav -->
         <li class="nav-item">
@@ -29,7 +30,7 @@
                 <i class="bi bi-journal-text"></i>
                 <span>Subjects</span>
             </a>
-        </li><!-- End Subjects Nav -->
+        </li>
 
         <!-- Enrollments Nav -->
         <li class="nav-item">
@@ -38,7 +39,7 @@
                 <i class="bi bi-person-check"></i>
                 <span>Enrollments</span>
             </a>
-        </li><!-- End Enrollments Nav -->
+        </li>
 
         <!-- Grades Nav -->
         <li class="nav-item">
@@ -47,9 +48,66 @@
                 <i class="bi bi-card-list"></i>
                 <span>Grades</span>
             </a>
-        </li><!-- End Grades Nav -->
+        </li>
 
-        <li class="nav-heading">Settings</li>
+        <!-- Student Navigation -->
+        <li class="nav-heading">Student Pages</li>
+
+        <!-- Student Dashboard -->
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('student.dashboard') ? '' : 'collapsed' }}" 
+               href="{{ route('student.dashboard') }}">
+                <i class="bi bi-grid"></i>
+                <span>Student Dashboard</span>
+            </a>
+        </li>
+
+        <!-- Academic Records Nav -->
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('student.records.*') ? '' : 'collapsed' }}"
+               data-bs-target="#academic-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-mortarboard"></i>
+                <span>Academic Records</span>
+                <i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="academic-nav" class="nav-content collapse {{ request()->routeIs('student.records.*') ? 'show' : '' }}" 
+                data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="{{ route('student.records.index') }}" 
+                       class="{{ request()->routeIs('student.records.index') ? 'active' : '' }}">
+                        <i class="bi bi-circle"></i>
+                        <span>GWA Summary</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Enrollment Records Nav -->
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('student.enrollment.*') ? '' : 'collapsed' }}" 
+               data-bs-target="#enrollment-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-journal-text"></i>
+                <span>My Enrollment</span>
+                <i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="enrollment-nav" class="nav-content collapse {{ request()->routeIs('student.enrollment.*') ? 'show' : '' }}" 
+                data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="{{ route('student.enrollment.subjects') }}" 
+                       class="{{ request()->routeIs('student.enrollment.subjects') ? 'active' : '' }}">
+                        <i class="bi bi-circle"></i>
+                        <span>Current Subjects</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('student.enrollment.history') }}" 
+                       class="{{ request()->routeIs('student.enrollment.history') ? 'active' : '' }}">
+                        <i class="bi bi-circle"></i>
+                        <span>Enrollment History</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
 
         <!-- Profile Nav -->
         <li class="nav-item">
@@ -57,7 +115,7 @@
                 <i class="bi bi-person"></i>
                 <span>Profile</span>
             </a>
-        </li><!-- End Profile Nav -->
+        </li>
 
         <!-- Logout Nav -->
         <li class="nav-item">
@@ -69,7 +127,7 @@
                     <span>Sign Out</span>
                 </a>
             </form>
-        </li><!-- End Logout Nav -->
+        </li>
 
     </ul>
 </aside><!-- End Sidebar-->

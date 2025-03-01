@@ -35,30 +35,25 @@ class GradeController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate the input
+        $validated = $request->validate([
+            'grade' => 'required|numeric',
+            'enrollment_id' => 'required|exists:enrollments,id', // Ensure enrollment_id is provided
+        ]);
+
         try {
-            $validated = $request->validate([
-                'enrollment_id' => 'required|exists:enrollments,id',
-                'grade' => 'required|numeric|in:1.00,1.25,1.50,1.75,2.00,2.25,2.50,2.75,3.00,5.00'
+            // Create the grade
+            Grade::create([
+                'grade' => $validated['grade'],
+                'enrollment_id' => $validated['enrollment_id'], // Associate with enrollment
             ]);
-
-            $enrollment = Enrollment::findOrFail($validated['enrollment_id']);
-            if ($enrollment->status !== 'enrolled') {
-                return back()->withErrors(['error' => 'Can only add grades to enrolled students.']);
-            }
-
-            if ($enrollment->grade) {
-                return back()->withErrors(['error' => 'Grade already exists for this enrollment.']);
-            }
-
-            Grade::create($validated);
 
             return redirect()->route('admin.grades.index')
                 ->with('success', 'Grade added successfully.');
-
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to add grade. ' . $e->getMessage()]);
+                ->withErrors(['error' => 'Failed to add grade: ' . $e->getMessage()]);
         }
     }
 

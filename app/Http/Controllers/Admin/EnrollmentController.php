@@ -42,49 +42,53 @@ class EnrollmentController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate the input
         $validated = $request->validate([
             'student_input' => 'required|string',
             'subject_id' => 'required|exists:subjects,id',
             'academic_year' => 'required|string',
-            'status' => 'required|in:enrolled,dropped,completed'
+            'status' => 'required|string'
         ]);
 
+        // Find student by ID or name
+        $studentInput = trim($validated['student_input']);
+        $student = null;
+        
+        // Try to find by student_id first
+        $student = Student::where('student_id', $studentInput)->first();
+        
+        // If not found, try to find by name
+        if (!$student) {
+            $student = Student::where('name', 'like', "%{$studentInput}%")->first();
+        }
+        
+        // If still not found, return with error
+        if (!$student) {
+            $availableIds = Student::pluck('student_id')->implode(', ');
+            return back()
+                ->withInput()
+                ->withErrors(['student_input' => "Student not found. Available Student IDs: {$availableIds}"]);
+        }
+
+        // Get the subject to retrieve its semester
+        $subject = Subject::findOrFail($validated['subject_id']);
+
         try {
-            // Check if student exists
-            $student = Student::where('student_id', $validated['student_input'])
-                ->orWhere('name', 'LIKE', "%{$validated['student_input']}%")
-                ->first();
-
-            if (!$student) {
-                return back()
-                    ->withInput()
-                    ->withErrors(['student_input' => 'Student not found. Please add the student first before enrolling.']);
-            }
-
-            // Get the subject and its semester
-            $subject = Subject::find($validated['subject_id']);
-
-            // Create the enrollment with subject's semester
+            // Create the enrollment
             Enrollment::create([
                 'student_id' => $student->id,
                 'subject_id' => $validated['subject_id'],
-                'semester' => $subject->semester,  // Get semester directly from subject
                 'academic_year' => $validated['academic_year'],
+                'semester' => $subject->semester,
                 'status' => $validated['status']
             ]);
 
             return redirect()->route('admin.enrollments.index')
-                ->with('success', 'Enrollment created successfully.');
+                ->with('success', 'Student enrolled successfully.');
         } catch (\Exception $e) {
-            if (str_contains($e->getMessage(), 'Duplicate entry') && str_contains($e->getMessage(), 'unique')) {
-                return back()
-                    ->withInput()
-                    ->withErrors(['error' => 'This student is already enrolled in this subject for the selected semester and academic year.']);
-            }
-
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to create enrollment. ' . $e->getMessage()]);
+                ->withErrors(['error' => 'Failed to create enrollment: ' . $e->getMessage()]);
         }
     }
 

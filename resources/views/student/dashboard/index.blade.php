@@ -51,10 +51,8 @@
                             <table class="table table-borderless datatable">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Code</th>
+                                        <th scope="col">Subject Code</th>
                                         <th scope="col">Subject</th>
-                                        <th scope="col">Schedule</th>
-                                        <th scope="col">Instructor</th>
                                         <th scope="col">Grade</th>
                                     </tr>
                                 </thead>
@@ -63,8 +61,6 @@
                                     <tr>
                                         <th scope="row">{{ $subject->code }}</th>
                                         <td>{{ $subject->name }}</td>
-                                        <td>{{ $subject->schedule }}</td>
-                                        <td>{{ $subject->instructor }}</td>
                                         <td><span class="badge bg-success">{{ $subject->grade ?? 'Ongoing' }}</span></td>
                                     </tr>
                                     @endforeach
