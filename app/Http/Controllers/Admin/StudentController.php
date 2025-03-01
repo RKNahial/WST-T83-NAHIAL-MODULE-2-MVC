@@ -7,6 +7,7 @@ use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
@@ -38,10 +39,17 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required|email|unique:users',
+            'email' => [
+                'required',
+                'email',
+                'unique:users',
+                'regex:/^[a-zA-Z0-9._%+-]+@student\.buksu\.edu\.ph$/'
+            ],
             'student_id' => 'required|unique:users',
             'course' => 'required',
             'year_level' => 'required'
+        ], [
+            'email.regex' => 'Email must use the @student.buksu.edu.ph domain.'
         ]);
 
         // Generate a temporary password
@@ -101,10 +109,17 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $student->user_id . ',id',
+            'email' => [
+                'required',
+                'email',
+                'unique:users,email,' . $student->user_id . ',id',
+                'regex:/^[a-zA-Z0-9._%+-]+@student\.buksu\.edu\.ph$/'
+            ],
             'student_id' => 'required|unique:users,student_id,' . $student->user_id . ',id',
             'course' => 'required',
             'year_level' => 'required'
+        ], [
+            'email.regex' => 'Email must use the @student.buksu.edu.ph domain.'
         ]);
 
         try {
@@ -140,13 +155,30 @@ class StudentController extends Controller
     public function destroy(Student $student)
     {
         try {
+            // Begin a database transaction
+            DB::beginTransaction();
+
+            // Get the user ID before deleting the student
+            $userId = $student->user_id;
+
+            // Delete the student record
             $student->delete();
+
+            // Delete the associated user record
+            User::where('id', $userId)->delete();
+
+            // Commit the transaction
+            DB::commit();
 
             return redirect()->route('admin.students.index')
                 ->with('success', 'Student deleted successfully.');
+
         } catch (\Exception $e) {
+            // Rollback the transaction if something goes wrong
+            DB::rollBack();
+
             return redirect()->route('admin.students.index')
-                ->with('error', 'Failed to delete student.');
+                ->with('error', 'Failed to delete student: ' . $e->getMessage());
         }
     }
 

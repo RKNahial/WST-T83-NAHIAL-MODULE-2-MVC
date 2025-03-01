@@ -36,9 +36,11 @@
                         <li class="nav-item">
                             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
                         </li>
-                        <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
-                        </li>
+                        @if(Auth::user()->role !== 'student')
+                            <li class="nav-item">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
+                            </li>
+                        @endif
                         <li class="nav-item">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Change Password</button>
                         </li>
@@ -56,33 +58,71 @@
                                 <div class="col-lg-3 col-md-4 label">Email</div>
                                 <div class="col-lg-9 col-md-8">{{ Auth::user()->email }}</div>
                             </div>
+
+                            @php
+                                function getOrdinalYear($year) {
+                                    switch ($year) {
+                                        case 1:
+                                            return '1st Year';
+                                        case 2:
+                                            return '2nd Year';
+                                        case 3:
+                                            return '3rd Year';
+                                        case 4:
+                                            return '4th Year';
+                                        default:
+                                            return $year . 'th Year';
+                                    }
+                                }
+                            @endphp
+
+                            @if(Auth::user()->role === 'student' && Auth::user()->student)
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Student ID</div>
+                                    <div class="col-lg-9 col-md-8">{{ Auth::user()->student->student_id }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Course</div>
+                                    <div class="col-lg-9 col-md-8">{{ Auth::user()->student->course }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Year Level</div>
+                                    <div class="col-lg-9 col-md-8">{{ getOrdinalYear(Auth::user()->student->year_level) }}</div>
+                                </div>
+                            @endif
                         </div>
 
-                        <!-- Profile Edit Form -->
-                        <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
-                            <form method="post" action="{{ route('profile.update') }}">
-                                @csrf
-                                @method('patch')
+                        @if(Auth::user()->role !== 'student')
+                            <!-- Profile Edit Form -->
+                            <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+                                <form method="post" action="{{ route('profile.update') }}">
+                                    @csrf
+                                    @method('patch')
 
-                                <div class="row mb-3">
-                                    <label for="name" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
-                                    <div class="col-md-8 col-lg-9">
-                                        <input name="name" type="text" class="form-control" id="name" value="{{ old('name', Auth::user()->name) }}">
+                                    <div class="row mb-3">
+                                        <label for="name" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            <input name="name" type="text" class="form-control" id="name" 
+                                                value="{{ old('name', Auth::user()->name) }}" 
+                                                {{ Auth::user()->role === 'student' ? 'disabled' : '' }}>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="row mb-3">
-                                    <label for="email" class="col-md-4 col-lg-3 col-form-label">Email</label>
-                                    <div class="col-md-8 col-lg-9">
-                                        <input name="email" type="email" class="form-control" id="email" value="{{ old('email', Auth::user()->email) }}">
+                                    <div class="row mb-3">
+                                        <label for="email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            <input name="email" type="email" class="form-control" id="email" 
+                                                value="{{ old('email', Auth::user()->email) }}" 
+                                                {{ Auth::user()->role === 'student' ? 'disabled' : '' }}>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="text-end">
-                                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                                </div>
-                            </form>
-                        </div>
+                                    <div class="text-end">
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        @endif
 
                         <!-- Change Password Form -->
                         <div class="tab-pane fade pt-3" id="profile-change-password">

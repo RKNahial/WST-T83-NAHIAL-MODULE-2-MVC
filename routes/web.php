@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Student\StudentAcademicController;
 use App\Http\Controllers\Student\StudentEnrollmentController;
 use App\Http\Controllers\Student\StudentRecordsController;
+use App\Http\Controllers\Admin\AdminController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,6 +46,9 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
 
     // Grades
     Route::resource('grades', GradeController::class);
+
+    // Admins
+    Route::resource('admins', AdminController::class);
 });
 
 // STUDENT ROUTE

@@ -47,6 +47,23 @@
             @endif
         </div>
 
+        @if($user->role === 'student' && $user->student)
+            <div>
+                <x-input-label for="student_id" :value="__('Student ID')" />
+                <x-text-input id="student_id" type="text" class="mt-1 block w-full" :value="$user->student->student_id" disabled />
+            </div>
+
+            <div>
+                <x-input-label for="course" :value="__('Course')" />
+                <x-text-input id="course" type="text" class="mt-1 block w-full" :value="$user->student->course" disabled />
+            </div>
+
+            <div>
+                <x-input-label for="year_level" :value="__('Year Level')" />
+                <x-text-input id="year_level" type="text" class="mt-1 block w-full" :value="$user->student->year_level" disabled />
+            </div>
+        @endif
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
@@ -57,7 +74,7 @@
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
                     class="text-sm text-gray-600 dark:text-gray-400"
-                >{{ __('Saved.') }}</p>
+                >{{ __('Profile updated successfully!') }}</p>
             @endif
         </div>
     </form>

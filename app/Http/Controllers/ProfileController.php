@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 
 class ProfileController extends Controller
 {
@@ -18,8 +19,8 @@ class ProfileController extends Controller
     public function edit(Request $request): View
     {
         return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+            'user' => $request->user()->load('student')
+        ]); 
     }
 
     /**
@@ -27,15 +28,25 @@ class ProfileController extends Controller
      */
     public function update(Request $request)
     {
-        $request->validate([
+        // Prevent students from updating their profile
+        if ($request->user()->role === 'student') {
+            return back()->with('error', 'Students cannot modify their profile information. Please contact an administrator.');
+        }
+
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . auth()->id()],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
         ]);
 
-        auth()->user()->update($request->only('name', 'email'));
+        $request->user()->fill($validated);
 
-        return redirect()->route('profile.edit')
-            ->with('status', 'Your profile has been updated successfully.');
+        if ($request->user()->isDirty('email')) {
+            $request->user()->email_verified_at = null;
+        }
+
+        $request->user()->save();
+
+        return back()->with('status', 'Profile updated successfully.');
     }
 
     /**
@@ -59,18 +70,17 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    public function updatePassword(Request $request)
+    public function updatePassword(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validateWithBag('updatePassword', [
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        auth()->user()->update([
-            'password' => Hash::make($request->password)
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
         ]);
 
-        return redirect()->route('profile.edit')
-            ->with('status', 'Your password has been changed successfully.');
+        return back()->with('success', 'Password updated successfully!');
     }
 }
