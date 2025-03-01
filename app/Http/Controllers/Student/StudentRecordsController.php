@@ -6,9 +6,29 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Enrollment;
 use App\Models\Subject;
+use App\Models\Grade;
 
-class StudentEnrollmentController extends Controller
+class StudentRecordsController extends Controller
 {
+    public function index()
+    {
+        $student = auth()->user()->student;
+        
+        // Get enrollments with grades, sorted by academic year and semester
+        $enrollments = Enrollment::where('student_id', $student->id)
+            ->with(['subject', 'grade'])
+            ->orderBy('academic_year', 'asc')
+            ->orderBy('semester', 'asc')
+            ->get();
+
+        // Group enrollments by academic year and semester
+        $groupedEnrollments = $enrollments->groupBy(['academic_year', 'semester']);
+
+        return view('student.records.index', [
+            'groupedEnrollments' => $groupedEnrollments
+        ]);
+    }
+
     public function subjects()
     {
         $student = auth()->user()->student;

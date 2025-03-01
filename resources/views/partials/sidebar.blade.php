@@ -71,15 +71,6 @@
                 </a>
             </li>
 
-            <!-- Enrollment History -->
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('student.enrollment.history') ? '' : 'collapsed' }}" 
-                   href="{{ route('student.enrollment.history') }}">
-                    <i class="bi bi-clock-history"></i>
-                    <span>Enrollment History</span>
-                </a>
-            </li>
-
             <!-- GWA Summary -->
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('student.records.index') ? '' : 'collapsed' }}" 
