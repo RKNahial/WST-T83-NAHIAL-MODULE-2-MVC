@@ -32,6 +32,42 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+        <style>
+            /* Force hide the footer */
+            .dataTable-bottom,
+            .dataTable-info,
+            .dataTable-pagination,
+            .datatable-bottom,
+            .datatable tfoot,
+            .datatable-pagination,
+            .datatable-info {
+                display: none !important;
+            }
+            
+            /* Make all row paddings consistent */
+            .datatable tbody tr td,
+            .table tbody tr td {
+                padding: 0.75rem !important;
+            }
+            
+            /* Remove bottom border and keep consistent padding */
+            .datatable tbody tr:last-child td,
+            .table tbody tr:last-child td {
+                border-bottom: none !important;
+                padding: 0.75rem !important;  /* Same padding as other rows */
+            }
+
+            /* Remove extra spacing at table bottom */
+            .datatable,
+            .table {
+                margin-bottom: 0 !important;
+            }
+
+            /* Adjust card body padding */
+            .card-body {
+                padding-bottom: 1.5rem !important;
+            }
+        </style>
     </head>
     <body>
         @include('partials.header')
@@ -60,6 +96,21 @@
         <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
-        @stack('scripts')
+        @push('scripts')
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const tables = document.querySelectorAll(".datatable");
+                tables.forEach(table => {
+                    new simpleDatatables.DataTable(table, {
+                        perPageSelect: false,
+                        searchable: false,
+                        footer: false,
+                        paging: false,
+                        info: false
+                    });
+                });
+            });
+        </script>
+        @endpush
     </body>
 </html>
