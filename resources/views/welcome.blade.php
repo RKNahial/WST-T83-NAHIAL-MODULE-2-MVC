@@ -38,9 +38,9 @@
         .hero {
             background: linear-gradient(135deg, 
                         rgba(0, 153, 255, 0.95) 0%, 
-                        rgba(13, 110, 253, 0.85) 40%,
-                        rgba(13, 110, 253, 0.2) 100%),
-                        url('assets/img/hero-background.jpg') center/cover no-repeat fixed;
+                        rgba(13, 110, 253, 0.40) 50%,
+                        rgba(255, 255, 255, 0) 100%),
+                        url('assets/img/hero-background.jpg');
             padding: 155px 0;
             position: relative;
             min-height: 500px;
@@ -48,7 +48,7 @@
             align-items: center;
             background-position: center;
             background-size: cover;
-            background-attachment: fixed;
+            background-attachment: scroll;
         }
 
         .hero-text {
@@ -173,7 +173,7 @@
                 <div class="col-lg-7 hero-text">
                     <h1>Academic Management at Your Fingertips</h1>
                     <p>Access your academic records, track your progress, and manage your student life all in one place.</p>
-                    <a href="{{ route('login') }}" class="btn btn-light btn-custom">Start your Journey</a>
+                    <a href="{{ route('login') }}" class="btn btn-primary btn-custom">Start your Journey</a>
                 </div>
             </div>
         </div>
@@ -183,8 +183,17 @@
     <section class="py-5" id="features">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="fw-bold mb-3">Simple & Efficient</h2>
-                <p class="text-muted">Easy access to your academic information</p>
+                <h1 class="fw-bold mb-4">Simple & Efficient</h1>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <p class="text-muted mt-1">
+                            A user-friendly system designed for seamless access to academic records.
+                            View and manage student information, subjects, grades, and enrollment with just a few clicks. 
+                            Optimized for speed and efficiency, ensuring a hassle-free experience for administrators, 
+                            teachers, and students alike.
+                        </p>
+                    </div>
+                </div>
             </div>
 
             <div class="row g-4 justify-content-center">

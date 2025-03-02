@@ -33,7 +33,15 @@
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">
                         <h6>{{ Auth::user()->name }}</h6>
-                        <span>Administrator</span>
+                        <span>
+                            @if(auth()->user()->role === 'student')
+                                Student
+                            @elseif(auth()->user()->role === 'admin')
+                                Administrator
+                            @else
+                                {{ ucfirst(auth()->user()->role) }}
+                            @endif
+                        </span>
                     </li>
                     <li>
                         <hr class="dropdown-divider">
