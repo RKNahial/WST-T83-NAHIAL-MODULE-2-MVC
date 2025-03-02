@@ -106,6 +106,9 @@
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // Store the original table HTML for reset purposes
+        const originalTableHTML = document.querySelector('.datatable tbody').innerHTML;
+        
         // Initialize DataTable with specific configuration
         const datatable = new simpleDatatables.DataTable(".datatable", {
             perPageSelect: false,
@@ -124,6 +127,10 @@
             const yearValue = yearFilter.value;
             const semesterValue = semesterFilter.value;
 
+            // Reset table to original state first
+            const tableBody = document.querySelector('.datatable tbody');
+            tableBody.innerHTML = originalTableHTML;
+
             // Get all rows from the table
             const rows = Array.from(document.querySelectorAll('.datatable tbody tr'));
             let visibleCount = 0;
@@ -139,26 +146,15 @@
                 const semesterMatch = !semesterValue || semesterCell === semesterValue;
 
                 if (yearMatch && semesterMatch) {
-                    row.classList.remove('hide');
+                    row.style.display = '';
                     visibleCount++;
                 } else {
-                    row.classList.add('hide');
+                    row.style.display = 'none';
                 }
             });
 
-            // Handle no results message
-            const tableBody = document.querySelector('.datatable tbody');
-            let noResultsRow = tableBody.querySelector('.no-results-row');
-
             if (visibleCount === 0) {
-                // Remove any existing message first
-                if (noResultsRow) {
-                    noResultsRow.remove();
-                }
-
-                // Create and insert new message row
-                noResultsRow = document.createElement('tr');
-                noResultsRow.className = 'no-results-row';
+                const noResultsRow = document.createElement('tr');
                 noResultsRow.innerHTML = `
                     <td colspan="6" class="text-center">
                         <div class="alert alert-info mb-0">
@@ -166,12 +162,11 @@
                         </div>
                     </td>
                 `;
+                tableBody.innerHTML = '';
                 tableBody.appendChild(noResultsRow);
-            } else if (noResultsRow) {
-                noResultsRow.remove();
             }
 
-            // Force DataTable to acknowledge the changes
+            // Force DataTable to update
             datatable.refresh();
         }
 
@@ -192,24 +187,6 @@
         if (yearFilter && semesterFilter) {
             yearFilter.addEventListener('change', filterTable);
             semesterFilter.addEventListener('change', filterTable);
-        }
-
-        // Initial check for empty table
-        const initialRows = document.querySelectorAll('.datatable tbody tr:not(.no-results-row)').length;
-        if (initialRows === 0) {
-            const tableBody = document.querySelector('.datatable tbody');
-            if (!tableBody.querySelector('.no-results-row')) {
-                const noResultsRow = document.createElement('tr');
-                noResultsRow.className = 'no-results-row';
-                noResultsRow.innerHTML = `
-                    <td colspan="6" class="text-center">
-                        <div class="alert alert-info mb-0">
-                            No records found.
-                        </div>
-                    </td>
-                `;
-                tableBody.appendChild(noResultsRow);
-            }
         }
     });
 </script>
