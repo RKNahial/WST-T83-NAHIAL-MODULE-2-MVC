@@ -38,21 +38,19 @@ class SubjectController extends Controller
                 'semester' => 'required|in:1,2,3'
             ]);
 
-            $subject = new Subject();
-            $subject->code = $validated['subject_code'];
-            $subject->name = $validated['subject_name'];
-            $subject->units = $validated['units'];
-            $subject->semester = $validated['semester'];
-            $subject->save();
+            Subject::create([
+                'code' => $validated['subject_code'],
+                'name' => $validated['subject_name'],
+                'units' => $validated['units'],
+                'semester' => $validated['semester']
+            ]);
 
             return redirect()->route('admin.subjects.index')
                 ->with('success', 'Subject created successfully');
         } catch (\Exception $e) {
-            \Log::error('Subject creation failed: ' . $e->getMessage());
-            
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to create subject. ' . $e->getMessage()]);
+                ->with('error', 'Failed to create subject. Please try again.');
         }
     }
 
@@ -76,50 +74,43 @@ class SubjectController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Subject $subject)
     {
         try {
-            $subject = Subject::findOrFail($id);
-            
             $validated = $request->validate([
-                'subject_code' => 'required|string|unique:subjects,code,' . $id,
+                'subject_code' => 'required|string|unique:subjects,code,' . $subject->id,
                 'subject_name' => 'required|string|max:255',
                 'units' => 'required|integer|min:1|max:6',
                 'semester' => 'required|in:1,2,3'
             ]);
 
-            $subject->code = $validated['subject_code'];
-            $subject->name = $validated['subject_name'];
-            $subject->units = $validated['units'];
-            $subject->semester = $validated['semester'];
-            $subject->save();
+            $subject->update([
+                'code' => $validated['subject_code'],
+                'name' => $validated['subject_name'],
+                'units' => $validated['units'],
+                'semester' => $validated['semester']
+            ]);
 
             return redirect()->route('admin.subjects.index')
                 ->with('success', 'Subject updated successfully');
         } catch (\Exception $e) {
-            \Log::error('Subject update failed: ' . $e->getMessage());
-            
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to update subject. ' . $e->getMessage()]);
+                ->with('error', 'Failed to update subject. Please try again.');
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Subject $subject)
     {
         try {
-            $subject = Subject::findOrFail($id);
             $subject->delete();
-
             return redirect()->route('admin.subjects.index')
                 ->with('success', 'Subject deleted successfully');
         } catch (\Exception $e) {
-            \Log::error('Subject deletion failed: ' . $e->getMessage());
-            
-            return back()->withErrors(['error' => 'Failed to delete subject. ' . $e->getMessage()]);
+            return back()->with('error', 'Failed to delete subject. Please try again.');
         }
     }
 }

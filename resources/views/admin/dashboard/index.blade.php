@@ -20,7 +20,7 @@
                                 </div>
                                 <div class="ps-3">
                                     <h6>{{ $totalStudents }}</h6>
-                                    <span class="text-muted small pt-2">Currently enrolled</span>
+                                    <span class="text-muted small pt-2">Currently active</span>
                                 </div>
                             </div>
                         </div>

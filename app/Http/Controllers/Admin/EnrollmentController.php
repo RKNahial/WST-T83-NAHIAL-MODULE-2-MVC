@@ -42,54 +42,62 @@ class EnrollmentController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the input
-        $validated = $request->validate([
-            'student_input' => 'required|string',
-            'subject_id' => 'required|exists:subjects,id',
-            'academic_year' => 'required|string',
-            'status' => 'required|string'
-        ]);
-
-        // Find student by ID or name
-        $studentInput = trim($validated['student_input']);
-        $student = null;
-        
-        // Try to find by student_id first
-        $student = Student::where('student_id', $studentInput)->first();
-        
-        // If not found, try to find by name
-        if (!$student) {
-            $student = Student::where('name', 'like', "%{$studentInput}%")->first();
-        }
-        
-        // If still not found, return with error
-        if (!$student) {
-            $availableIds = Student::pluck('student_id')->implode(', ');
-            return back()
-                ->withInput()
-                ->withErrors(['student_input' => "Student not found. Available Student IDs: {$availableIds}"]);
-        }
-
-        // Get the subject to retrieve its semester
-        $subject = Subject::findOrFail($validated['subject_id']);
-
         try {
-            // Create the enrollment
+            // Find student
+            $student = $this->findStudent($request->student_input);
+            
+            // Get subject
+            $subject = Subject::findOrFail($request->subject_id);
+
+            // Check for existing enrollment
+            $existingEnrollment = Enrollment::where('student_id', $student->id)
+                ->where('subject_id', $request->subject_id)
+                ->where('academic_year', $request->academic_year)
+                ->where('semester', $subject->semester)
+                ->first();
+
+            if ($existingEnrollment) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Student is already enrolled in this subject for the selected semester.');
+            }
+            
+            // Create enrollment
             Enrollment::create([
                 'student_id' => $student->id,
-                'subject_id' => $validated['subject_id'],
-                'academic_year' => $validated['academic_year'],
+                'subject_id' => $request->subject_id,
+                'academic_year' => $request->academic_year,
                 'semester' => $subject->semester,
-                'status' => $validated['status']
+                'status' => $request->status
             ]);
 
+            // Single success message
             return redirect()->route('admin.enrollments.index')
                 ->with('success', 'Student enrolled successfully.');
+            
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to create enrollment: ' . $e->getMessage()]);
+                ->with('error', 'Failed to enroll student. Please try again.');
         }
+    }
+
+    private function findStudent($input)
+    {
+        // Try to find by student_id first
+        $student = Student::where('student_id', $input)->first();
+        
+        // If not found, try to find by name
+        if (!$student) {
+            $student = Student::where('name', 'like', "%{$input}%")->first();
+        }
+        
+        // If still not found, throw an exception
+        if (!$student) {
+            throw new \Exception('Student not found');
+        }
+
+        return $student;
     }
 
     /**
@@ -143,11 +151,12 @@ class EnrollmentController extends Controller
     {
         try {
             $enrollment->delete();
+            
+            // Single success message
             return redirect()->route('admin.enrollments.index')
-                ->with('success', 'Enrollment deleted successfully');
+                ->with('success', 'Enrollment deleted successfully.');
         } catch (\Exception $e) {
-            return back()
-                ->withErrors(['error' => 'Failed to delete enrollment. ' . $e->getMessage()]);
+            return back()->with('error', 'Failed to delete enrollment. Please try again.');
         }
     }
 
@@ -165,25 +174,13 @@ class EnrollmentController extends Controller
         return $years;
     }
 
-    public function updateStatus(Request $request, EnrolledSubject $enrolledSubject)
+    public function updateStatus(Request $request, Enrollment $enrollment)
     {
-        $request->validate([
-            'status' => 'required|in:enrolled,dropped,completed'
-        ]);
-
-        // If status is being changed to 'dropped', delete the grade
-        if ($request->status === 'dropped') {
-            // Delete the associated grade if it exists
-            if ($enrolledSubject->grade) {
-                $enrolledSubject->grade->delete();
-            }
+        try {
+            $enrollment->update(['status' => $request->status]);
+            return redirect()->back()->with('success', 'Status updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update status.');
         }
-
-        // Update the status
-        $enrolledSubject->update([
-            'status' => $request->status
-        ]);
-
-        return redirect()->back()->with('success', 'Subject status updated successfully');
     }
 }

@@ -76,6 +76,33 @@
         
         <main id="main" class="main">
             @include('partials.breadcrumbs')
+            
+            <!-- Single place for all alerts -->
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             @yield('content')
         </main>
 
@@ -99,6 +126,7 @@
         @push('scripts')
         <script>
             document.addEventListener("DOMContentLoaded", function() {
+                // Remove or modify this part as it might be conflicting
                 const tables = document.querySelectorAll(".datatable");
                 tables.forEach(table => {
                     new simpleDatatables.DataTable(table, {
@@ -109,8 +137,19 @@
                         info: false
                     });
                 });
+
+                // Keep the alert auto-dismiss functionality
+                setTimeout(function() {
+                    const alerts = document.querySelectorAll('.alert:not(.alert-important)');
+                    alerts.forEach(function(alert) {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    });
+                }, 2500);
             });
         </script>
         @endpush
+
+        @stack('scripts')
     </body>
 </html>

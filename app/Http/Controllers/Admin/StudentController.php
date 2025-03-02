@@ -75,14 +75,12 @@ class StudentController extends Controller
                 'year_level' => $request->year_level
             ]);
 
-            return back()
-                ->with('success', 'Student added successfully!')
-                ->with('temp_password', $temporaryPassword);
-
+            return redirect()->route('admin.students.index')
+                ->with('success', 'Student created successfully');
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to create student. ' . $e->getMessage()]);
+                ->with('error', 'Failed to create student. Please try again.');
         }
     }
 
@@ -140,12 +138,11 @@ class StudentController extends Controller
             ]);
 
             return redirect()->route('admin.students.index')
-                ->with('success', 'Student updated successfully!');
-
+                ->with('success', 'Student updated successfully');
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to update student. ' . $e->getMessage()]);
+                ->with('error', 'Failed to update student. Please try again.');
         }
     }
 
@@ -155,30 +152,11 @@ class StudentController extends Controller
     public function destroy(Student $student)
     {
         try {
-            // Begin a database transaction
-            DB::beginTransaction();
-
-            // Get the user ID before deleting the student
-            $userId = $student->user_id;
-
-            // Delete the student record
             $student->delete();
-
-            // Delete the associated user record
-            User::where('id', $userId)->delete();
-
-            // Commit the transaction
-            DB::commit();
-
             return redirect()->route('admin.students.index')
-                ->with('success', 'Student deleted successfully.');
-
+                ->with('success', 'Student deleted successfully');
         } catch (\Exception $e) {
-            // Rollback the transaction if something goes wrong
-            DB::rollBack();
-
-            return redirect()->route('admin.students.index')
-                ->with('error', 'Failed to delete student: ' . $e->getMessage());
+            return back()->with('error', 'Failed to delete student. Please try again.');
         }
     }
 

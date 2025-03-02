@@ -50,7 +50,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($enrolledSubjects ?? [] as $subject)
+                            @forelse($enrolledSubjects ?? [] as $subject)
                             <tr>
                                 <td>{{ $subject->subject->code }}</td>
                                 <td>{{ $subject->subject->name }}</td>
@@ -85,7 +85,15 @@
                                     @endif
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="alert alert-info mb-0" role="alert">
+                                        No subjects found for the selected filters.
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -98,57 +106,111 @@
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // Initialize DataTable with specific configuration
         const datatable = new simpleDatatables.DataTable(".datatable", {
             perPageSelect: false,
-            searchable: false
+            searchable: false,
+            paging: true,
+            footer: false,
+            labels: {
+                noRows: `<div class="alert alert-info mb-0">No records found for the selected filters.</div>`
+            }
         });
 
-        // Filter functions
-        function filterRows() {
-            const yearFilter = document.getElementById('academicYearFilter').value;
-            const semesterFilter = document.getElementById('semesterFilter').value;
+        const yearFilter = document.getElementById('academicYearFilter');
+        const semesterFilter = document.getElementById('semesterFilter');
 
-            // Get all rows
-            const rows = document.querySelectorAll('.datatable tbody tr');
-            let visibleRows = 0;
+        function filterTable() {
+            const yearValue = yearFilter.value;
+            const semesterValue = semesterFilter.value;
+
+            // Get all rows from the table
+            const rows = Array.from(document.querySelectorAll('.datatable tbody tr'));
+            let visibleCount = 0;
 
             rows.forEach(row => {
-                const cells = row.getElementsByTagName('td');
-                const year = cells[2].textContent.trim(); // Academic Year column
-                const semester = cells[3].textContent.trim(); // Semester column
+                // Skip if it's a message row
+                if (row.querySelector('td[colspan]')) return;
 
-                const yearMatch = !yearFilter || year === yearFilter;
-                const semesterMatch = !semesterFilter || semester === semesterFilter;
+                const yearCell = row.cells[2]?.textContent.trim();
+                const semesterCell = row.cells[3]?.textContent.trim();
 
-                const isVisible = yearMatch && semesterMatch;
-                row.classList.toggle('hide', !isVisible);
-                
-                if (isVisible) {
-                    visibleRows++;
+                const yearMatch = !yearValue || yearCell === yearValue;
+                const semesterMatch = !semesterValue || semesterCell === semesterValue;
+
+                if (yearMatch && semesterMatch) {
+                    row.classList.remove('hide');
+                    visibleCount++;
+                } else {
+                    row.classList.add('hide');
                 }
             });
 
-            // Show/hide no results message
-            const noResultsMessage = document.getElementById('noResults');
-            const tableElement = document.querySelector('.datatable');
-            
-            if (visibleRows === 0) {
-                noResultsMessage.style.display = 'block';
-                tableElement.style.display = 'none';
-            } else {
-                noResultsMessage.style.display = 'none';
-                tableElement.style.display = 'table';
+            // Handle no results message
+            const tableBody = document.querySelector('.datatable tbody');
+            let noResultsRow = tableBody.querySelector('.no-results-row');
+
+            if (visibleCount === 0) {
+                // Remove any existing message first
+                if (noResultsRow) {
+                    noResultsRow.remove();
+                }
+
+                // Create and insert new message row
+                noResultsRow = document.createElement('tr');
+                noResultsRow.className = 'no-results-row';
+                noResultsRow.innerHTML = `
+                    <td colspan="6" class="text-center">
+                        <div class="alert alert-info mb-0">
+                            No records found for the selected filters.
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(noResultsRow);
+            } else if (noResultsRow) {
+                noResultsRow.remove();
             }
+
+            // Force DataTable to acknowledge the changes
+            datatable.refresh();
         }
 
-        // Event listeners for filters
-        document.getElementById('academicYearFilter').addEventListener('change', filterRows);
-        document.getElementById('semesterFilter').addEventListener('change', filterRows);
-
-        // Add CSS for hidden rows
+        // Style for hidden rows
         const style = document.createElement('style');
-        style.textContent = '.hide { display: none !important; }';
+        style.textContent = `
+            .hide {
+                display: none !important;
+            }
+            .datatable-empty {
+                text-align: center;
+                padding: 1rem;
+            }
+        `;
         document.head.appendChild(style);
+
+        // Add filter event listeners
+        if (yearFilter && semesterFilter) {
+            yearFilter.addEventListener('change', filterTable);
+            semesterFilter.addEventListener('change', filterTable);
+        }
+
+        // Initial check for empty table
+        const initialRows = document.querySelectorAll('.datatable tbody tr:not(.no-results-row)').length;
+        if (initialRows === 0) {
+            const tableBody = document.querySelector('.datatable tbody');
+            if (!tableBody.querySelector('.no-results-row')) {
+                const noResultsRow = document.createElement('tr');
+                noResultsRow.className = 'no-results-row';
+                noResultsRow.innerHTML = `
+                    <td colspan="6" class="text-center">
+                        <div class="alert alert-info mb-0">
+                            No records found.
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(noResultsRow);
+            }
+        }
     });
 </script>
 @endpush
