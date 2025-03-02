@@ -8,20 +8,23 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">All Subjects</h5>
-
-                    <!-- Filters -->
-                    <div class="row mb-3">
-                        <div class="col-md-3">
-                            <select id="academicYearFilter" class="form-select">
-                                <option value="">All Academic Years</option>
-                                @foreach($academicYears as $year)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endforeach
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <h5 class="card-title">All Subjects</h5>
+                        <div class="d-flex gap-2 align-items-center">
+                            <!-- Academic Year Filter -->
+                            <select id="academicYearFilter" class="form-select" style="width: auto;">
+                                <option value="">All Years</option>
+                                @php
+                                    $currentYear = 2024;  
+                                    $endYear = 2026;     
+                                @endphp
+                                @for($year = $currentYear; $year <= $endYear; $year++)
+                                    <option value="{{ $year }}-{{ $year + 1 }}">{{ $year }}-{{ $year + 1 }}</option>
+                                @endfor
                             </select>
-                        </div>
-                        <div class="col-md-3">
-                            <select id="semesterFilter" class="form-select">
+
+                            <!-- Semester Filter -->
+                            <select id="semesterFilter" class="form-select" style="width: auto;">
                                 <option value="">All Semesters</option>
                                 <option value="First Semester">First Semester</option>
                                 <option value="Second Semester">Second Semester</option>
