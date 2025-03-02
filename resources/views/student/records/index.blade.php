@@ -42,7 +42,9 @@
                                             <td>{{ $enrollment->subject->name }}</td>
                                             <td>{{ $enrollment->subject->units }}</td>
                                             <td>
-                                                @if($enrollment->grade)
+                                                @if($enrollment->status == 'dropped')
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                @elseif($enrollment->grade)
                                                     {{ number_format($enrollment->grade->grade, 2) }}
                                                 @else
                                                     <span class="badge bg-warning">No grade yet</span>
@@ -66,7 +68,9 @@
                                         <td>
                                             @php
                                                 $semesterGrades = $enrollments->filter(function($enrollment) {
-                                                    return $enrollment->grade && $enrollment->grade->grade > 0;
+                                                    return $enrollment->status != 'dropped' && 
+                                                           $enrollment->grade && 
+                                                           $enrollment->grade->grade > 0;
                                                 });
                                                 
                                                 $gwa = $semesterGrades->count() > 0 

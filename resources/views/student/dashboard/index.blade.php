@@ -94,7 +94,7 @@
                                             </td>
                                         </tr>
                                     @empty
-                                        <!-- No empty line will be shown if there are no subjects -->
+                                     
                                     @endforelse
                                 </tbody>
                             </table>
