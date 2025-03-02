@@ -20,10 +20,11 @@ class DashboardController extends Controller
         $currentAcademicYear = Setting::where('name', 'current_academic_year')->first()->value ?? '2023-2024';
         $currentSemester = Setting::where('name', 'current_semester')->first()->value ?? 1;
 
-        // Get current semester subjects
+        // Get current semester subjects (excluding dropped)
         $currentSubjects = Enrollment::where('student_id', $student->id)
             ->where('academic_year', $currentAcademicYear)
             ->where('semester', $currentSemester)
+            ->whereIn('status', ['enrolled', 'completed'])  // Only get enrolled and completed
             ->with(['subject', 'grade'])
             ->get();
 

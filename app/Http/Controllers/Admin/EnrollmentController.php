@@ -164,4 +164,26 @@ class EnrollmentController extends Controller
         
         return $years;
     }
+
+    public function updateStatus(Request $request, EnrolledSubject $enrolledSubject)
+    {
+        $request->validate([
+            'status' => 'required|in:enrolled,dropped,completed'
+        ]);
+
+        // If status is being changed to 'dropped', delete the grade
+        if ($request->status === 'dropped') {
+            // Delete the associated grade if it exists
+            if ($enrolledSubject->grade) {
+                $enrolledSubject->grade->delete();
+            }
+        }
+
+        // Update the status
+        $enrolledSubject->update([
+            'status' => $request->status
+        ]);
+
+        return redirect()->back()->with('success', 'Subject status updated successfully');
+    }
 }

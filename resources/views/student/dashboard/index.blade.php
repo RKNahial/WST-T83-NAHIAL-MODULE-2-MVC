@@ -48,28 +48,54 @@
                     <div class="card recent-sales overflow-auto">
                         <div class="card-body">
                             <h5 class="card-title">Current Subjects <span>| {{ $currentSemester }}</span></h5>
-                            <table class="table table-borderless datatable">
+                            <table class="table datatable">
                                 <thead>
                                     <tr>
                                         <th scope="col">Subject Code</th>
                                         <th scope="col">Subject</th>
+                                        <th scope="col">Academic Year</th>
+                                        <th scope="col">Semester</th>
                                         <th scope="col">Grade</th>
+                                        <th scope="col">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($currentSubjects ?? [] as $subject)
-                                    <tr>
-                                        <th scope="row">{{ $subject->subject->code }}</th>
-                                        <td>{{ $subject->subject->name }}</td>
-                                        <td>
-                                            @if($subject->grade)
-                                                <span class="badge bg-success">{{ number_format($subject->grade->grade, 2) }}</span>
-                                            @else
-                                                <span class="badge bg-warning">No grade yet</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @endforeach
+                                    @forelse($currentSubjects as $subject)
+                                        <tr>
+                                            <td>{{ $subject->subject->code }}</td>
+                                            <td>{{ $subject->subject->name }}</td>
+                                            <td>{{ $subject->academic_year }}</td>
+                                            <td>
+                                                @switch($subject->semester)
+                                                    @case(1)
+                                                        First Semester
+                                                        @break
+                                                    @case(2)
+                                                        Second Semester
+                                                        @break
+                                                    @case(3)
+                                                        Summer
+                                                        @break
+                                                @endswitch
+                                            </td>
+                                            <td>
+                                                @if($subject->grade)
+                                                    {{ number_format($subject->grade->grade, 2) }}
+                                                @else
+                                                    <span class="badge bg-warning">No grade yet</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($subject->status == 'enrolled')
+                                                    <span class="badge bg-success">Enrolled</span>
+                                                @elseif($subject->status == 'completed')
+                                                    <span class="badge bg-info">Completed</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <!-- No empty line will be shown if there are no subjects -->
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -81,13 +107,13 @@
 </section>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
-    $(document).ready(function() {
-        $('.datatable').DataTable({
-            "pageLength": 10,
-            "ordering": false
+    document.addEventListener("DOMContentLoaded", function() {
+        const datatable = new simpleDatatables.DataTable(".datatable", {
+            perPageSelect: false,
+            searchable: false
         });
     });
 </script>
-@endsection
+@endpush
