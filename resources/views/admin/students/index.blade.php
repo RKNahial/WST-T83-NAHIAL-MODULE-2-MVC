@@ -16,37 +16,14 @@
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
-            <!-- Success Message -->
-            @if(session('success'))
+            <!-- Special case for temp_password - keep this part -->
+            @if(session('temp_password'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    @if(session('temp_password'))
-                        <div class="mt-2 p-2 bg-light border rounded">
-                            <strong>Important!</strong>
-                            <div class="text-monospace">{{ session('temp_password') }}</div>
-                            <small class="text-muted">Please save this password or share it with the student securely.</small>
-                        </div>
-                    @endif
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            <!-- Error Message -->
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert" id="error-alert">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            <!-- Validation Errors -->
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert" id="validation-alert">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                    <div class="mt-2 p-2 bg-light border rounded">
+                        <strong>Important!</strong>
+                        <div class="text-monospace">{{ session('temp_password') }}</div>
+                        <small class="text-muted">Please save this password or share it with the student securely.</small>
+                    </div>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif

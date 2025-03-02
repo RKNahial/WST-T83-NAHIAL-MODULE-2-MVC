@@ -10,16 +10,6 @@
                 <div class="card-body">
                     <h5 class="card-title">Edit Enrollment</h5>
 
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
                     <form action="{{ route('admin.enrollments.update', $enrollment->id) }}" method="POST" class="row g-3">
                         @csrf
                         @method('PUT')

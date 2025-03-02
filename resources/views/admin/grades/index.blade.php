@@ -6,34 +6,6 @@
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
-            <!-- Success Message -->
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            <!-- Error Message -->
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert" id="error-alert">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            <!-- Validation Errors -->
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert" id="validation-alert">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-1 mt-3 mx-2">
@@ -359,16 +331,6 @@
             yearFilter.addEventListener('change', filterTable);
             semesterFilter.addEventListener('change', filterTable);
         }
-
-        // Auto-hide alerts after 2.5 seconds
-        setTimeout(function() {
-            const alerts = document.querySelectorAll("#success-alert, #error-alert, #validation-alert");
-            alerts.forEach(alert => {
-                if(alert) {
-                    alert.style.display = 'none';
-                }
-            });
-        }, 2500);
     });
 </script>
 @endpush

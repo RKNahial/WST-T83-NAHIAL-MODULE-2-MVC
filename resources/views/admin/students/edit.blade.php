@@ -10,13 +10,6 @@
                 <div class="card-body">
                     <h5 class="card-title">Edit Student</h5>
 
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" id="successAlert" role="alert">
-                            <strong>{{ session('success') }}</strong>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
                     <form action="{{ route('admin.students.update', $student->id) }}" method="POST">
                         @csrf
                         @method('PUT')

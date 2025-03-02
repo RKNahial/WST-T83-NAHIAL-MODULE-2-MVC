@@ -10,16 +10,6 @@
                 <div class="card-body">
                     <h5 class="card-title">Add New Subject</h5>
 
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
                     <form action="{{ route('admin.subjects.store') }}" method="POST">
                         @csrf
 
