@@ -10,7 +10,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Add New Student</h5>
 
-                    @if (session('success'))
+                    @if (session('success') && session('temp_password'))
                         <div class="alert alert-success alert-dismissible fade show" id="successAlert" role="alert">
                             <strong>{{ session('success') }}</strong>
                             <hr>

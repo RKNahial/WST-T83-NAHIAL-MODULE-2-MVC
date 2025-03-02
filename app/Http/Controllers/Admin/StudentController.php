@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class StudentController extends Controller
 {
@@ -37,51 +38,38 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => [
-                'required',
-                'email',
-                'unique:users',
-                'regex:/^[a-zA-Z0-9._%+-]+@student\.buksu\.edu\.ph$/'
-            ],
-            'student_id' => 'required|unique:users',
-            'course' => 'required',
-            'year_level' => 'required'
-        ], [
-            'email.regex' => 'Email must use the @student.buksu.edu.ph domain.'
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'student_id' => 'required|string|max:255|unique:students',
+            'email' => 'required|email|unique:users',
+            'course' => 'required|string|max:255',
+            'year_level' => 'required|in:1,2,3,4',
         ]);
-
-        // Generate a temporary password
-        $temporaryPassword = substr(str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&'), 0, 10);
-
-        try {
-            // Create user account for student
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'student_id' => $request->student_id,
-                'password' => Hash::make($temporaryPassword),
-                'role' => 'student'
-            ]);
-
-            // Create student record with all required fields
-            Student::create([
-                'user_id' => $user->id,
-                'name' => $request->name,
-                'email' => $request->email,
-                'student_id' => $request->student_id,
-                'course' => $request->course,
-                'year_level' => $request->year_level
-            ]);
-
-            return redirect()->route('admin.students.index')
-                ->with('success', 'Student created successfully');
-        } catch (\Exception $e) {
-            return back()
-                ->withInput()
-                ->with('error', 'Failed to create student. Please try again.');
-        }
+        
+        // Generate a random password
+        $tempPassword = Str::random(8);
+        
+        // Create user account
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($tempPassword),
+            'role' => 'student',
+        ]);
+        
+        // Create student record
+        Student::create([
+            'user_id' => $user->id,
+            'name' => $validated['name'],
+            'student_id' => $validated['student_id'],
+            'email' => $validated['email'],
+            'course' => $validated['course'],
+            'year_level' => $validated['year_level'],
+        ]);
+        
+        return redirect()->route('admin.students.create')
+            ->with('success', 'Student added successfully!')
+            ->with('temp_password', $tempPassword);
     }
 
     /**
