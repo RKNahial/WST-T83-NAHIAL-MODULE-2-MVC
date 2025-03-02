@@ -121,54 +121,77 @@
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Filter function
-        function filterRows() {
-            const semesterFilter = document.getElementById('semesterFilter').value;
-            const yearFilter = document.getElementById('yearFilter').value;
+        // Store the original table HTML for reset purposes
+        const originalTableHTML = document.querySelector('.datatable tbody').innerHTML;
+        
+        // Initialize DataTable with specific configuration
+        const datatable = new simpleDatatables.DataTable(".datatable", {
+            perPageSelect: false,
+            searchable: false,
+            paging: true,
+            footer: false,
+            labels: {
+                noRows: `<div class="alert alert-info mb-0">No records found for the selected filters.</div>`
+            }
+        });
 
-            // Get all rows
-            const rows = document.querySelectorAll('.datatable tbody tr');
-            let visibleRows = 0;
+        const yearFilter = document.getElementById('yearFilter');
+        const semesterFilter = document.getElementById('semesterFilter');
+
+        function filterTable() {
+            const yearValue = yearFilter.value;
+            const semesterValue = semesterFilter.value;
+
+            // Reset table to original state first
+            const tableBody = document.querySelector('.datatable tbody');
+            tableBody.innerHTML = originalTableHTML;
+
+            // Get all rows from the table
+            const rows = Array.from(document.querySelectorAll('.datatable tbody tr'));
+            let visibleCount = 0;
 
             rows.forEach(row => {
-                const cells = row.getElementsByTagName('td');
-                const semester = cells[3].textContent.trim(); // Adjust index based on your semester column
-                const year = cells[4].textContent.trim(); // Adjust index based on your academic year column
+                // Skip if it's a message row
+                if (row.querySelector('td[colspan]')) return;
 
-                const semesterMatch = !semesterFilter || semester.includes(semesterFilter);
-                const yearMatch = !yearFilter || year === yearFilter;
+                const yearCell = row.cells[4]?.textContent.trim(); // Academic Year column
+                const semesterCell = row.cells[3]?.textContent.trim(); // Semester column
 
-                const isVisible = semesterMatch && yearMatch;
-                row.classList.toggle('hide', !isVisible);
-                
-                if (isVisible) {
-                    visibleRows++;
+                const yearMatch = !yearValue || yearCell === yearValue;
+                const semesterMatch = !semesterValue || semesterCell === semesterValue;
+
+                if (yearMatch && semesterMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
                 }
             });
 
-            // Show/hide no results message
-            const noResultsMessage = document.getElementById('noResults');
-            const tableElement = document.querySelector('.datatable');
-            
-            if (visibleRows === 0) {
-                noResultsMessage.style.display = 'block';
-                tableElement.style.display = 'none';
-            } else {
-                noResultsMessage.style.display = 'none';
-                tableElement.style.display = 'table';
+            if (visibleCount === 0) {
+                const noResultsRow = document.createElement('tr');
+                noResultsRow.innerHTML = `
+                    <td colspan="7" class="text-center">
+                        <div class="alert alert-info mb-0">
+                            No enrollments found for the selected filters.
+                        </div>
+                    </td>
+                `;
+                tableBody.innerHTML = '';
+                tableBody.appendChild(noResultsRow);
             }
+
+            // Force DataTable to update
+            datatable.refresh();
         }
 
-        // Event listeners for filters
-        document.getElementById('semesterFilter').addEventListener('change', filterRows);
-        document.getElementById('yearFilter').addEventListener('change', filterRows);
+        // Add filter event listeners
+        if (yearFilter && semesterFilter) {
+            yearFilter.addEventListener('change', filterTable);
+            semesterFilter.addEventListener('change', filterTable);
+        }
 
-        // Add CSS for hidden rows
-        const style = document.createElement('style');
-        style.textContent = '.hide { display: none !important; }';
-        document.head.appendChild(style);
-
-        // Auto-hide alerts
+        // Auto-hide alerts after 2.5 seconds
         setTimeout(function() {
             const alerts = document.querySelectorAll("#success-alert, #error-alert, #validation-alert");
             alerts.forEach(alert => {

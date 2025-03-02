@@ -116,48 +116,70 @@
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Filter function
-        function filterRows() {
-            const semesterFilter = document.getElementById('semesterFilter').value;
+        // Store the original table HTML for reset purposes
+        const originalTableHTML = document.querySelector('.datatable tbody').innerHTML;
+        
+        // Initialize DataTable with specific configuration
+        const datatable = new simpleDatatables.DataTable(".datatable", {
+            perPageSelect: false,
+            searchable: false,
+            paging: true,
+            footer: false,
+            labels: {
+                noRows: `<div class="alert alert-info mb-0">No records found for the selected filters.</div>`
+            }
+        });
 
-            // Get all rows
-            const rows = document.querySelectorAll('.datatable tbody tr');
-            let visibleRows = 0;
+        const semesterFilter = document.getElementById('semesterFilter');
+
+        function filterTable() {
+            const semesterValue = semesterFilter.value;
+
+            // Reset table to original state first
+            const tableBody = document.querySelector('.datatable tbody');
+            tableBody.innerHTML = originalTableHTML;
+
+            // Get all rows from the table
+            const rows = Array.from(document.querySelectorAll('.datatable tbody tr'));
+            let visibleCount = 0;
 
             rows.forEach(row => {
-                const cells = row.getElementsByTagName('td');
-                const semester = cells[4].textContent.trim(); // Adjust index based on your semester column
+                // Skip if it's a message row
+                if (row.querySelector('td[colspan]')) return;
 
-                const semesterMatch = !semesterFilter || semester === semesterFilter;
+                const semesterCell = row.cells[4]?.textContent.trim(); // Adjust index based on your semester column
 
-                const isVisible = semesterMatch;
-                row.classList.toggle('hide', !isVisible);
-                
-                if (isVisible) {
-                    visibleRows++;
+                const semesterMatch = !semesterValue || semesterCell === semesterValue;
+
+                if (semesterMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
                 }
             });
 
-            // Show/hide no results message
-            const noResultsMessage = document.getElementById('noResults');
-            const tableElement = document.querySelector('.datatable');
-            
-            if (visibleRows === 0) {
-                noResultsMessage.style.display = 'block';
-                tableElement.style.display = 'none';
-            } else {
-                noResultsMessage.style.display = 'none';
-                tableElement.style.display = 'table';
+            if (visibleCount === 0) {
+                const noResultsRow = document.createElement('tr');
+                noResultsRow.innerHTML = `
+                    <td colspan="6" class="text-center">
+                        <div class="alert alert-info mb-0">
+                            No subjects found for the selected semester.
+                        </div>
+                    </td>
+                `;
+                tableBody.innerHTML = '';
+                tableBody.appendChild(noResultsRow);
             }
+
+            // Force DataTable to update
+            datatable.refresh();
         }
 
-        // Event listener for filter
-        document.getElementById('semesterFilter').addEventListener('change', filterRows);
-
-        // Add CSS for hidden rows
-        const style = document.createElement('style');
-        style.textContent = '.hide { display: none !important; }';
-        document.head.appendChild(style);
+        // Add filter event listener
+        if (semesterFilter) {
+            semesterFilter.addEventListener('change', filterTable);
+        }
 
         // Auto-hide alerts
         setTimeout(function() {
