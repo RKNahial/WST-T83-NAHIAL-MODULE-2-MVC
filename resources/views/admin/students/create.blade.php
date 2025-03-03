@@ -11,7 +11,7 @@
                     <h5 class="card-title">Add New Student</h5>
 
                     @if (session('success') && session('temp_password'))
-                        <div class="alert alert-success alert-dismissible fade show" id="successAlert" role="alert">
+                        <div class="alert alert-success alert-dismissible alert-important fade show" id="successAlert" role="alert">
                             <strong>{{ session('success') }}</strong>
                             <hr>
                             <p class="mb-0">Temporary Password: <strong id="tempPassword">{{ session('temp_password') }}</strong></p>
@@ -91,7 +91,7 @@
 </section>
 
 @if(session('success') && session('temp_password'))
-<div class="alert alert-success alert-dismissible fade show" id="successAlert" role="alert">
+<div class="alert alert-success alert-dismissible alert-important fade show" id="successAlert" role="alert">
     <strong>{{ session('success') }}</strong>
     <hr>
     <p class="mb-0">Temporary Password: <strong id="tempPassword">{{ session('temp_password') }}</strong></p>
@@ -104,37 +104,53 @@
 </div>
 
 <script>
+// Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Countdown timer
-    let timeLeft = 10;
+    // Get the elements
     const countdownElement = document.getElementById('countdown');
-    const alertElement = document.getElementById('successAlert');
-
-    const timer = setInterval(function() {
-        timeLeft--;
-        countdownElement.textContent = timeLeft;
+    const successAlert = document.getElementById('successAlert');
+    
+    // Only proceed if the elements exist
+    if (countdownElement && successAlert) {
+        let timeLeft = 10;
         
-        if (timeLeft <= 0) {
-            clearInterval(timer);
-            // Don't hide the alert, just redirect
-            window.location.href = "{{ route('admin.students.index') }}";
+        // Start the countdown
+        const countdownTimer = setInterval(function() {
+            timeLeft--;
+            countdownElement.textContent = timeLeft;
+            
+            // When countdown reaches zero
+            if (timeLeft <= 0) {
+                clearInterval(countdownTimer);
+                // Redirect to index page
+                window.location.href = "{{ route('admin.students.index') }}";
+            }
+        }, 1000);
+        
+        // Prevent the alert from being automatically dismissed
+        const closeButton = successAlert.querySelector('.btn-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', function() {
+                clearInterval(countdownTimer);
+            });
         }
-    }, 1000);
-
-    // Copy password functionality
-    function copyPassword() {
-        const password = document.getElementById('tempPassword').textContent;
-        navigator.clipboard.writeText(password).then(function() {
-            alert('Password copied to clipboard!');
-        });
     }
 });
 
+// Function to copy password to clipboard
 function copyPassword() {
-    const password = document.getElementById('tempPassword').textContent;
-    navigator.clipboard.writeText(password).then(function() {
+    const tempPassword = document.getElementById('tempPassword');
+    if (tempPassword) {
+        // Create a temporary input element
+        const tempInput = document.createElement('input');
+        tempInput.value = tempPassword.textContent;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        
         alert('Password copied to clipboard!');
-    });
+    }
 }
 </script>
 
