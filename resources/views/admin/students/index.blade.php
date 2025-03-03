@@ -7,6 +7,13 @@
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert" id="successAlert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <!-- Special case for temp_password - keep this part -->
             @if(session('temp_password'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -112,9 +119,10 @@
     </div>
 </section>
 
-@if(session('success'))
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-dismiss success alert
     setTimeout(function() {
         const alert = document.getElementById('successAlert');
         if (alert) {
@@ -127,21 +135,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert.remove();
             }, 500);
         }
-    }, 2500); 
+    }, 2500);
 
     // Add status filter functionality
     const statusFilter = document.getElementById('status-filter');
-    statusFilter.addEventListener('change', function() {
-        const baseUrl = '{{ route('admin.students.index') }}';
-        const status = this.value;
-        
-        if (status === 'active') {
-            window.location.href = baseUrl;
-        } else {
-            window.location.href = `${baseUrl}?status=${status}`;
-        }
-    });
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            const baseUrl = '{{ route('admin.students.index') }}';
+            const status = this.value;
+            
+            if (status === 'active') {
+                window.location.href = baseUrl;
+            } else {
+                window.location.href = `${baseUrl}?status=${status}`;
+            }
+        });
+    }
 });
 </script>
-@endif
+@endpush
+
 @endsection

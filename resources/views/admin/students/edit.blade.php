@@ -10,7 +10,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Edit Student</h5>
 
-                    <form action="{{ route('admin.students.update', $student->id) }}" method="POST">
+                    <form action="{{ route('admin.students.update', $student->id) }}" method="POST" id="studentForm">
                         @csrf
                         @method('PUT')
 
@@ -77,6 +77,115 @@
         </div>
     </div>
 </section>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Student Update</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-question mb-3">
+                    <h6>Would you like to update <strong id="studentNameConfirm"></strong>'s information?</h6>
+                </div>
+                
+                <div class="student-details">
+                    <div class="row">
+                        <div class="col-4 fw-bold">Full Name:</div>
+                        <div class="col-8" id="confirmName"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 fw-bold">Student ID:</div>
+                        <div class="col-8" id="confirmStudentId"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 fw-bold">Email:</div>
+                        <div class="col-8" id="confirmEmail"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 fw-bold">Course:</div>
+                        <div class="col-8" id="confirmCourse"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 fw-bold">Year Level:</div>
+                        <div class="col-8" id="confirmYearLevel"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="confirmSubmit">Confirm Update</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('#studentForm');
+    if (form) {
+        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get student name for the question
+            const studentName = form.name.value;
+            
+            // Populate modal with form values
+            document.getElementById('studentNameConfirm').textContent = studentName;
+            document.getElementById('confirmName').textContent = studentName;
+            document.getElementById('confirmStudentId').textContent = form.student_id.value;
+            document.getElementById('confirmEmail').textContent = form.email.value;
+            document.getElementById('confirmCourse').textContent = form.course.value;
+            document.getElementById('confirmYearLevel').textContent = 
+                form.year_level.options[form.year_level.selectedIndex].text;
+            
+            // Show modal
+            confirmationModal.show();
+        });
+        
+        // Handle confirmation
+        document.getElementById('confirmSubmit').addEventListener('click', function() {
+            confirmationModal.hide();
+            form.removeEventListener('submit', arguments.callee);
+            form.submit();
+        });
+    }
+});
+</script>
+@endpush
+
+@push('styles')
+<style>
+.student-details {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 1rem;
+}
+
+.student-details .row {
+    border-bottom: 1px solid #e9ecef;
+    padding: 0.5rem 0;
+}
+
+.student-details .row:last-child {
+    border-bottom: none;
+}
+
+.confirmation-question {
+    text-align: center;
+}
+
+.confirmation-question h6 {
+    color: #012970;
+    font-weight: 600;
+}
+</style>
+@endpush
 
 @if(session('success'))
 <script>
