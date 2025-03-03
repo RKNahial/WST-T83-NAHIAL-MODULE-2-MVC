@@ -17,11 +17,12 @@ return new class extends Migration
             $table->string('course');
             $table->integer('year_level');
             $table->timestamps();
+            $table->boolean('is_archived')->default(false);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('students');
+        $table->dropColumn('is_archived');
     }
 };

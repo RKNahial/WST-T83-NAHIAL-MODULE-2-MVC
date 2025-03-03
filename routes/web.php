@@ -36,6 +36,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     // Students
+    Route::post('students/{student}/archive', [StudentController::class, 'archive'])->name('students.archive');
     Route::resource('students', StudentController::class);
 
     // Subjects

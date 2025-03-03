@@ -15,7 +15,12 @@ class Student extends Model
         'email',
         'student_id',
         'course',
-        'year_level'
+        'year_level',
+        'is_archived'
+    ];
+
+    protected $casts = [
+        'is_archived' => 'boolean',
     ];
 
     public function enrollments()

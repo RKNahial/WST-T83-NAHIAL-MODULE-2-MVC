@@ -15,11 +15,16 @@ class StudentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $students = Student::all();
-            return view('admin.students.index', compact('students'));
+            $status = $request->query('status', 'active');
+            $students = Student::where('is_archived', $status === 'archived')->get();
+            
+            return view('admin.students.index', [
+                'students' => $students,
+                'currentStatus' => $status
+            ]);
         } catch (\Exception $e) {
             return back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
@@ -41,9 +46,16 @@ class StudentController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'student_id' => 'required|string|max:255|unique:students',
-            'email' => 'required|email|unique:users',
+            'email' => [
+                'required',
+                'email',
+                'unique:users',
+                'regex:/^[a-zA-Z0-9._%+-]+@student\.buksu\.edu\.ph$/'
+            ],
             'course' => 'required|string|max:255',
             'year_level' => 'required|in:1,2,3,4',
+        ], [
+            'email.regex' => 'Email must use the @student.buksu.edu.ph domain.'
         ]);
         
         // Generate a random password
@@ -135,16 +147,16 @@ class StudentController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Archive the specified resource.
      */
     public function destroy(Student $student)
     {
         try {
-            $student->delete();
+            $student->update(['is_archived' => true]);
             return redirect()->route('admin.students.index')
-                ->with('success', 'Student deleted successfully');
+                ->with('success', 'Student archived successfully');
         } catch (\Exception $e) {
-            return back()->with('error', 'Failed to delete student. Please try again.');
+            return back()->with('error', 'Failed to archive student. Please try again.');
         }
     }
 
@@ -153,14 +165,31 @@ class StudentController extends Controller
         try {
             $search = $request->get('search');
             
-            $students = Student::where('student_id', 'LIKE', "%{$search}%")
-                ->orWhere('name', 'LIKE', "%{$search}%")
+            $students = Student::where('is_archived', false)
+                ->where(function($query) use ($search) {
+                    $query->where('student_id', 'LIKE', "%{$search}%")
+                        ->orWhere('name', 'LIKE', "%{$search}%");
+                })
                 ->limit(10)
                 ->get(['id', 'student_id', 'name']);
 
             return response()->json($students);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function archive(Student $student)
+    {
+        try {
+            $student->update([
+                'is_archived' => !$student->is_archived
+            ]);
+
+            $message = $student->is_archived ? 'archived' : 'unarchived';
+            return redirect()->back()->with('success', "Student successfully {$message}");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to update student status. Please try again.');
         }
     }
 }
