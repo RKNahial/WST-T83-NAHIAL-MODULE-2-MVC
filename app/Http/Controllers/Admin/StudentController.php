@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreStudentRequest;
+use App\Http\Requests\Admin\UpdateStudentRequest;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -41,22 +43,9 @@ class StudentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreStudentRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'student_id' => 'required|string|max:255|unique:students',
-            'email' => [
-                'required',
-                'email',
-                'unique:users',
-                'regex:/^[a-zA-Z0-9._%+-]+@student\.buksu\.edu\.ph$/'
-            ],
-            'course' => 'required|string|max:255',
-            'year_level' => 'required|in:1,2,3,4',
-        ], [
-            'email.regex' => 'Email must use the @student.buksu.edu.ph domain.'
-        ]);
+        $validated = $request->validated();
         
         // Generate a random password
         $tempPassword = Str::random(8);
@@ -103,23 +92,8 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Student $student)
+    public function update(UpdateStudentRequest $request, Student $student)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => [
-                'required',
-                'email',
-                'unique:users,email,' . $student->user_id . ',id',
-                'regex:/^[a-zA-Z0-9._%+-]+@student\.buksu\.edu\.ph$/'
-            ],
-            'student_id' => 'required|unique:users,student_id,' . $student->user_id . ',id',
-            'course' => 'required',
-            'year_level' => 'required'
-        ], [
-            'email.regex' => 'Email must use the @student.buksu.edu.ph domain.'
-        ]);
-
         try {
             // Update user information
             $student->user->update([
