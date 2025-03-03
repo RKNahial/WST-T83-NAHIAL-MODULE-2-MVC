@@ -48,13 +48,14 @@
                                 <th scope="col">Email</th>
                                 <th scope="col">Course</th>
                                 <th scope="col">Year Level</th>
+                                <th scope="col">Status</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($students ?? [] as $student)
+                            @forelse($students as $student)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <th scope="row">{{ $loop->iteration }}</th>
                                 <td>{{ $student->student_id }}</td>
                                 <td>{{ $student->name }}</td>
                                 <td>{{ $student->email }}</td>
@@ -78,18 +79,31 @@
                                     @endswitch
                                 </td>
                                 <td>
+                                    @if($student->is_archived)
+                                        <span class="badge bg-secondary">Archived</span>
+                                    @else
+                                        <span class="badge bg-success">Active</span>
+                                    @endif
+                                </td>
+                                <td>
                                     <a href="{{ route('admin.students.edit', $student->id) }}" class="btn btn-primary btn-sm">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <form action="{{ route('admin.students.archive', $student->id) }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to {{ $student->is_archived ? 'unarchive' : 'archive' }} this student?')">
+                                        <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to {{ $student->is_archived ? 'restore' : 'archive' }} this student?')">
                                             <i class="bi {{ $student->is_archived ? 'bi-arrow-counterclockwise' : 'bi-archive' }}"></i>
                                         </button>
                                     </form>
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    No {{ $currentStatus === 'archived' ? 'archived' : 'active' }} students found.
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
