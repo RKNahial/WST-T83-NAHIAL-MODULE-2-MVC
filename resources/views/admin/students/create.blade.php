@@ -90,7 +90,19 @@
     </div>
 </section>
 
-@if(session('success'))
+@if(session('success') && session('temp_password'))
+<div class="alert alert-success alert-dismissible fade show" id="successAlert" role="alert">
+    <strong>{{ session('success') }}</strong>
+    <hr>
+    <p class="mb-0">Temporary Password: <strong id="tempPassword">{{ session('temp_password') }}</strong></p>
+    <p class="mb-0 text-danger">Please copy this password now! This message will disappear in <span id="countdown">10</span> seconds.</p>
+    <div class="mt-3">
+        <button type="button" class="btn btn-primary" onclick="copyPassword()">Copy Password</button>
+        <a href="{{ route('admin.students.index') }}" class="btn btn-secondary">Go to Students List</a>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Countdown timer
@@ -104,23 +116,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (timeLeft <= 0) {
             clearInterval(timer);
-            alertElement.style.display = 'none';
-            
-            // Set a timeout to redirect after the alert disappears
-            setTimeout(function() {
-                window.location.href = "{{ route('admin.students.index') }}";
-            }, 2500); // 2.5 seconds after the alert disappears
+            // Don't hide the alert, just redirect
+            window.location.href = "{{ route('admin.students.index') }}";
         }
     }, 1000);
 
     // Copy password functionality
-    const tempPasswordElement = document.getElementById('tempPassword');
-    tempPasswordElement.addEventListener('click', function() {
-        const password = this.textContent;
+    function copyPassword() {
+        const password = document.getElementById('tempPassword').textContent;
         navigator.clipboard.writeText(password).then(function() {
             alert('Password copied to clipboard!');
         });
-    });
+    }
 });
 
 function copyPassword() {
