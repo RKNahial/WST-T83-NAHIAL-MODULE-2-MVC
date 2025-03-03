@@ -26,10 +26,11 @@ class DashboardController extends Controller
         $enrollmentCount = Enrollment::count();
 
         // Get current enrollments (only for current semester)
-        $currentEnrollments = Enrollment::where('academic_year', $currentAcademicYear)
-            ->where('semester', $currentSemester)
-            ->where('status', 'enrolled')  // Only count active enrollments
-            ->count();
+        $currentEnrollments = Enrollment::whereHas('student', function($query) {
+            $query->where('is_archived', false);
+        })
+        ->where('status', 'enrolled')
+        ->count();
 
         // Get recent students with their current semester enrollments
         $recentStudents = Student::with(['enrollments' => function($query) use ($currentAcademicYear, $currentSemester) {

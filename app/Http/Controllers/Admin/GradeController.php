@@ -17,6 +17,9 @@ class GradeController extends Controller
     public function index()
     {
         $enrollments = Enrollment::with(['student', 'subject', 'grade'])
+            ->whereHas('student', function($query) {
+                $query->where('is_archived', false);
+            })
             ->where('status', 'enrolled')
             ->get();
         

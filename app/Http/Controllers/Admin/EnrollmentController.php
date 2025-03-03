@@ -18,7 +18,11 @@ class EnrollmentController extends Controller
     public function index()
     {
         try {
-            $enrollments = Enrollment::with(['student', 'subject'])->get();
+            $enrollments = Enrollment::with(['student', 'subject'])
+                ->whereHas('student', function($query) {
+                    $query->where('is_archived', false);
+                })
+                ->get();
             return view('admin.enrollments.index', compact('enrollments'));
         } catch (\Exception $e) {
             \Log::error('Enrollment index error: ' . $e->getMessage());
