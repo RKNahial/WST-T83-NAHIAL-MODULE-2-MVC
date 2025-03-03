@@ -6,6 +6,12 @@
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert" id="successAlert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-1 mt-3 mx-2">
@@ -98,7 +104,9 @@
                                             onsubmit="return confirm('Are you sure you want to delete this grade?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm">
+                                            <button type="submit" class="btn btn-danger btn-sm delete-grade-btn" 
+                                                data-student-name="{{ $enrollment->student->name }}"
+                                                data-subject-name="{{ $enrollment->subject->name }}">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -232,6 +240,27 @@
     </div>
 </section>
 
+<!-- Delete Grade Confirmation Modal -->
+<div class="modal fade" id="deleteGradeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">  
+                <h5 class="modal-title">Confirm Delete Grade</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-question mb-3">
+                    <h6 id="deleteGradeMessage" class="text-center"></h6>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="confirmDeleteGrade">Delete</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -331,6 +360,45 @@
             yearFilter.addEventListener('change', filterTable);
             semesterFilter.addEventListener('change', filterTable);
         }
+
+        // Handle success alert auto-dismiss
+        setTimeout(function() {
+            const alert = document.getElementById('successAlert');
+            if (alert) {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }
+        }, 2500);
+
+        // Delete grade confirmation modal handling
+        const deleteGradeModal = new bootstrap.Modal(document.getElementById('deleteGradeModal'));
+        let deleteGradeForm = null;
+
+        // Handle delete button clicks
+        document.querySelectorAll('.delete-grade-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                deleteGradeForm = this.closest('form');
+                
+                const studentName = this.dataset.studentName;
+                const subjectName = this.dataset.subjectName;
+                
+                // Set confirmation message
+                const message = `Are you sure you want to delete the grade for ${studentName} in ${subjectName}?`;
+                document.getElementById('deleteGradeMessage').textContent = message;
+                
+                deleteGradeModal.show();
+            });
+        });
+
+        // Handle confirmation button click
+        document.getElementById('confirmDeleteGrade').addEventListener('click', function() {
+            if (deleteGradeForm) {
+                deleteGradeForm.submit();
+            }
+            deleteGradeModal.hide();
+        });
     });
 </script>
 @endpush
