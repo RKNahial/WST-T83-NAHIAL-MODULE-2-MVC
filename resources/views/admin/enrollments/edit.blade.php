@@ -10,7 +10,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Edit Enrollment</h5>
 
-                    <form action="{{ route('admin.enrollments.update', $enrollment->id) }}" method="POST" class="row g-3">
+                    <form action="{{ route('admin.enrollments.update', $enrollment->id) }}" method="POST" class="row g-3" id="enrollmentForm">
                         @csrf
                         @method('PUT')
 
@@ -41,7 +41,6 @@
                             @error('subject_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <!-- Add hidden semester field -->
                             <input type="hidden" name="semester" id="semester_input" value="{{ old('semester', $enrollment->semester) }}">
                         </div>
 
@@ -83,31 +82,143 @@
                             <a href="{{ route('admin.enrollments.index') }}" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-@section('scripts')
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Enrollment Update</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-question mb-3">
+                    <h6>Would you like to update enrollment for <strong id="studentNameConfirm"></strong>?</h6>
+                </div>
+                
+                <div class="enrollment-details">
+                    <div class="row">
+                        <div class="col-4 fw-bold">Student:</div>
+                        <div class="col-8" id="confirmStudent"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 fw-bold">Subject:</div>
+                        <div class="col-8" id="confirmSubject"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 fw-bold">Academic Year:</div>
+                        <div class="col-8" id="confirmYear"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 fw-bold">Status:</div>
+                        <div class="col-8" id="confirmStatus"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="confirmSubmit">Confirm Update</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('styles')
+<style>
+.enrollment-details {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 1rem;
+}
+
+.enrollment-details .row {
+    border-bottom: 1px solid #e9ecef;
+    padding: 0.5rem 0;
+}
+
+.enrollment-details .row:last-child {
+    border-bottom: none;
+}
+
+.confirmation-question {
+    text-align: center;
+}
+
+.confirmation-question h6 {
+    color: #012970;
+    font-weight: 600;
+}
+</style>
+@endpush
+
+@push('scripts')
 <script>
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('#enrollmentForm');
+    if (form) {
+        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get student info and form values
+            const studentInfo = document.querySelector('input[disabled]').value;
+            const subjectSelect = document.getElementById('subject_id');
+            const subjectText = subjectSelect.options[subjectSelect.selectedIndex].text;
+            const yearSelect = document.getElementById('academic_year');
+            const yearText = yearSelect.options[yearSelect.selectedIndex].text;
+            const statusSelect = document.getElementById('status');
+            const statusText = statusSelect.options[statusSelect.selectedIndex].text;
+            
+            // Populate modal with form values
+            document.getElementById('studentNameConfirm').textContent = studentInfo.split(' (')[0];
+            document.getElementById('confirmStudent').textContent = studentInfo;
+            document.getElementById('confirmSubject').textContent = subjectText;
+            document.getElementById('confirmYear').textContent = yearText;
+            document.getElementById('confirmStatus').textContent = statusText;
+            
+            // Show modal
+            confirmationModal.show();
+        });
+        
+        // Handle confirmation
+        document.getElementById('confirmSubmit').addEventListener('click', function() {
+            confirmationModal.hide();
+            form.removeEventListener('submit', arguments.callee);
+            form.submit();
+        });
+    }
+
     // Function to update hidden semester field
     function updateSemester() {
-        var selectedOption = $('#subject_id option:selected');
-        var semester = selectedOption.data('semester');
-        $('#semester_input').val(semester);
+        var selectedOption = document.querySelector('#subject_id option:selected');
+        var semester = selectedOption.dataset.semester;
+        document.getElementById('semester_input').value = semester;
     }
 
     // Update semester when subject changes
-    $('#subject_id').change(updateSemester);
+    document.getElementById('subject_id').addEventListener('change', updateSemester);
 
     // Initial update if a subject is already selected
-    if ($('#subject_id').val()) {
+    if (document.getElementById('subject_id').value) {
         updateSemester();
     }
 });
 </script>
-@endsection
+@endpush
+
+@if(session('success'))
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        window.location.href = "{{ route('admin.enrollments.index') }}";
+    }, 2500); 
+});
+</script>
+@endif
 @endsection

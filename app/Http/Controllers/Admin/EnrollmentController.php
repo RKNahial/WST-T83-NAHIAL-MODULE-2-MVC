@@ -81,7 +81,7 @@ class EnrollmentController extends Controller
             ]);
 
             return redirect()->route('admin.enrollments.index')
-                ->with('success', 'Student enrolled successfully.');
+                ->with('success', "{$student->name} successfully enrolled in {$subject->name}.");
             
         } catch (\Exception $e) {
             return back()
@@ -137,7 +137,7 @@ class EnrollmentController extends Controller
             $enrollment->update($request->validated());
 
             return redirect()->route('admin.enrollments.index')
-                ->with('success', 'Student enrolled successfully.');
+                ->with('success', 'Student enrollment is updated successfully.');
         } catch (\Exception $e) {
             return back()
                 ->withInput()
