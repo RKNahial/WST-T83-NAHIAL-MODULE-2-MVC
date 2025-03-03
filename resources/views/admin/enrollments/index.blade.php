@@ -112,9 +112,7 @@
                             @empty
                             <tr>
                                 <td colspan="7" class="text-center">
-                                    <div class="alert alert-info mb-0" role="alert">
-                                        No enrollments found for the selected filters.
-                                    </div>
+                                    No enrollments found.
                                 </td>
                             </tr>
                             @endforelse
