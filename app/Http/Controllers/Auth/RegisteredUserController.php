@@ -30,14 +30,20 @@ class RegisteredUserController extends Controller
     {
         // Check email domain to determine role
         $email = $request->email;
-        if (!str_ends_with($email, '@buksu.edu.ph') && !str_ends_with($email, '@student.buksu.edu.ph')) {
+        
+        // Check if it's a student trying to register
+        if (str_ends_with($email, '@student.buksu.edu.ph')) {
             return back()
                 ->withInput()
-                ->withErrors(['email' => 'Please use a valid institutional email address (@buksu.edu.ph for admin or @student.buksu.edu.ph for students)']);
+                ->withErrors(['email' => 'Student registration is not allowed. Please contact your administrator.']);
         }
-
-        // Set role based on email domain
-        $role = str_ends_with($email, '@buksu.edu.ph') ? 'admin' : 'student';
+        
+        // Check if it's a valid admin email
+        if (!str_ends_with($email, '@buksu.edu.ph')) {
+            return back()
+                ->withInput()
+                ->withErrors(['email' => 'Please use a valid institutional email address (@buksu.edu.ph for administrators)']);
+        }
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -49,15 +55,14 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $role,
-            'student_id' => $role === 'student' ? $this->extractStudentId($email) : null,
+            'role' => 'admin',
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect($role === 'admin' ? '/admin/dashboard' : '/dashboard');
+        return redirect('/admin/dashboard');
     }
 
     /**
