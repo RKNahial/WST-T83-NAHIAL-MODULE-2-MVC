@@ -13,9 +13,21 @@ class SubjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $subjects = Subject::withCount('enrollments')->get();
+        $query = Subject::withCount('enrollments');
+        
+        // Filter by semester if selected
+        if ($request->has('semester') && $request->semester !== '') {
+            $semesterMap = [
+                'First Semester' => 1,
+                'Second Semester' => 2,
+                'Summer' => 3
+            ];
+            $query->where('semester', $semesterMap[$request->semester] ?? $request->semester);
+        }
+        
+        $subjects = $query->get();
         return view('admin.subjects.index', compact('subjects'));
     }
 

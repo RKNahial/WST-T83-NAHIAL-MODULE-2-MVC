@@ -29,12 +29,14 @@
                         <h5 class="card-title mb-0">Subject List</h5>
                         <div class="d-flex gap-2 align-items-center">
                             <!-- Semester Filter -->
-                            <select id="semesterFilter" class="form-select" style="width: auto;">
-                                <option value="">All Semesters</option>
-                                <option value="First Semester">First Semester</option>
-                                <option value="Second Semester">Second Semester</option>
-                                <option value="Summer">Summer</option>
-                            </select>
+                            <form method="GET" action="{{ route('admin.subjects.index') }}" class="d-inline">
+                                <select name="semester" class="form-select" onchange="this.form.submit()">
+                                    <option value="">All Semesters</option>
+                                    <option value="First Semester" {{ request('semester') == 'First Semester' ? 'selected' : '' }}>First Semester</option>
+                                    <option value="Second Semester" {{ request('semester') == 'Second Semester' ? 'selected' : '' }}>Second Semester</option>
+                                    <option value="Summer" {{ request('semester') == 'Summer' ? 'selected' : '' }}>Summer</option>
+                                </select>
+                            </form>
                             
                             <!-- Add New Subject Button -->
                             <a href="{{ route('admin.subjects.create') }}" class="btn btn-primary">
