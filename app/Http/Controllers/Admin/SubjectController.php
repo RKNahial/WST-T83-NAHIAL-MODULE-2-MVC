@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreSubjectRequest;
+use App\Http\Requests\Admin\UpdateSubjectRequest;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 
@@ -28,15 +30,10 @@ class SubjectController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSubjectRequest $request)
     {
         try {
-            $validated = $request->validate([
-                'subject_code' => 'required|string|unique:subjects,code',
-                'subject_name' => 'required|string|max:255',
-                'units' => 'required|integer|min:1|max:6',
-                'semester' => 'required|in:1,2,3'
-            ]);
+            $validated = $request->validated();
 
             Subject::create([
                 'code' => $validated['subject_code'],
@@ -74,15 +71,10 @@ class SubjectController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Subject $subject)
+    public function update(UpdateSubjectRequest $request, Subject $subject)
     {
         try {
-            $validated = $request->validate([
-                'subject_code' => 'required|string|unique:subjects,code,' . $subject->id,
-                'subject_name' => 'required|string|max:255',
-                'units' => 'required|integer|min:1|max:6',
-                'semester' => 'required|in:1,2,3'
-            ]);
+            $validated = $request->validated();
 
             $subject->update([
                 'code' => $validated['subject_code'],
