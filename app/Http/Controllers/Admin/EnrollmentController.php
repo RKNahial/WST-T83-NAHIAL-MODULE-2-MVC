@@ -46,6 +46,13 @@ class EnrollmentController extends Controller
             // Find student
             $student = $this->findStudent($request->student_input);
             
+            // Check if student is archived
+            if ($student->is_archived) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Cannot enroll an archived student. Please restore the student first.');
+            }
+            
             // Get subject
             $subject = Subject::findOrFail($request->subject_id);
 

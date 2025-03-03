@@ -1,15 +1,32 @@
 @extends('layouts.app')
 
-@section('title', 'New Enrollment')
-
 @section('content')
+<div class="pagetitle">
+    <h1>Add New Enrollment</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.enrollments.index') }}">Enrollments</a></li>
+            <li class="breadcrumb-item active">Add New</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Display error messages outside the card -->
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">New Enrollment</h5>
-
+                    <h5 class="card-title">Enrollment Details</h5>
+                    
                     <form action="{{ route('admin.enrollments.store') }}" method="POST" class="row g-3">
                         @csrf
 
