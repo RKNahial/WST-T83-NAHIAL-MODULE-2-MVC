@@ -32,18 +32,8 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+        <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet">
         <style>
-            /* Force hide the footer */
-            .dataTable-bottom,
-            .dataTable-info,
-            .dataTable-pagination,
-            .datatable-bottom,
-            .datatable tfoot,
-            .datatable-pagination,
-            .datatable-info {
-                display: none !important;
-            }
-            
             /* Make all row paddings consistent */
             .datatable tbody tr td,
             .table tbody tr td {
@@ -133,5 +123,7 @@
         @endpush
 
         @stack('scripts')
+
+        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest"></script>
     </body>
 </html>

@@ -145,6 +145,29 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTable with pagination
+    const datatable = new simpleDatatables.DataTable(".datatable", {
+        perPage: 10,                    // Show 10 entries per page
+        perPageSelect: true,            // Enable entries per page selection
+        perPageSelect: [10, 25, 50, 100], // Page length options
+        searchable: true,
+        sortable: true,
+        paging: true,                   // Explicitly enable pagination
+        labels: {
+            placeholder: "Search...",
+            perPage: "{select} entries per page",
+            noRows: "No entries found",
+            info: "Showing {start} to {end} of {rows} entries",
+            noResults: "No results match your search query",
+            paginate: {
+                first: "First",
+                last: "Last",
+                next: "Next",
+                previous: "Previous"
+            }
+        },
+    });
+
     // Initialize modal
     const modal = new bootstrap.Modal(document.getElementById('actionConfirmationModal'));
     let currentForm = null;
