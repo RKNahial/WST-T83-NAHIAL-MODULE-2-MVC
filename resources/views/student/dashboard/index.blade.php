@@ -94,7 +94,11 @@
                                             </td>
                                         </tr>
                                     @empty
-                                     
+                                        <tr>
+                                            <td colspan="6" class="text-center">
+                                                No subjects enrolled for {{ $currentSemester }}
+                                            </td>
+                                        </tr>
                                     @endforelse
                                 </tbody>
                             </table>

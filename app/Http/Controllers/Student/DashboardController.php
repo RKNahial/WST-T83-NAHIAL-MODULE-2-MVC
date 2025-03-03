@@ -35,7 +35,7 @@ class DashboardController extends Controller
         $currentSubjects = Enrollment::where('student_id', $student->id)
             ->where('academic_year', $currentAcademicYear)
             ->where('semester', $currentSemester)
-            ->whereIn('status', ['enrolled', 'completed']) // Only get enrolled and completed
+            ->whereIn('status', ['enrolled', 'completed'])
             ->with(['subject', 'grade'])
             ->get();
 
