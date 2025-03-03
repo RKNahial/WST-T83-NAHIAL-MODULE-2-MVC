@@ -57,7 +57,7 @@
                                 <option value="">Select Year Level</option>
                                 @for($i = 1; $i <= 4; $i++)
                                     <option value="{{ $i }}" {{ (old('year_level', $student->year_level) == $i) ? 'selected' : '' }}>
-                                        {{ $i }}th Year
+                                        {{ $i }}{{ $i === 1 ? 'st' : ($i === 2 ? 'nd' : ($i === 3 ? 'rd' : 'th')) }} Year
                                     </option>
                                 @endfor
                             </select>
