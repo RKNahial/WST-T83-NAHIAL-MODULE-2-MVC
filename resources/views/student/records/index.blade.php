@@ -87,9 +87,15 @@
                 @endforeach
             @empty
                 <div class="card">
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            No academic records found.
+                    <div class="card-body text-center py-5">
+                        <div class="empty-state">
+                            
+                                 <class="mb-4" style="max-width: 200px; opacity: 0.7;">
+                            <h3 class="mt-4" style="color: #012970;">No Grades Available Yet</h3>
+                            <p class="text-muted mb-4 px-4">
+                                You don't have any academic records or grades at the moment. 
+                                Grades will appear here once they are submitted by your instructors.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -109,4 +115,28 @@
         });
     });
 </script>
+@endpush
+
+@push('styles')
+<style>
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+    .alert-light-primary {
+        background-color: rgba(13, 110, 253, 0.05);
+        border-color: rgba(13, 110, 253, 0.1);
+    }
+    .empty-state-help ul {
+        list-style-type: none;
+        padding-left: 1.5rem;
+    }
+    .empty-state-help ul li::before {
+        content: "•";
+        color: #012970;
+        font-weight: bold;
+        display: inline-block;
+        width: 1em;
+        margin-left: -1em;
+    }
+</style>
 @endpush
