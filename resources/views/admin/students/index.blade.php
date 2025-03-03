@@ -98,7 +98,9 @@
                                     </a>
                                     <form action="{{ route('admin.students.archive', $student->id) }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to {{ $student->is_archived ? 'restore' : 'archive' }} this student?')">
+                                        <button type="submit" class="btn btn-warning btn-sm archive-btn" 
+                                                data-student-name="{{ $student->name }}" 
+                                                data-is-archived="{{ $student->is_archived }}">
                                             <i class="bi {{ $student->is_archived ? 'bi-arrow-counterclockwise' : 'bi-archive' }}"></i>
                                         </button>
                                     </form>
@@ -119,38 +121,71 @@
     </div>
 </section>
 
+<!-- Archive Confirmation Modal -->
+<div class="modal fade" id="actionConfirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-question mb-3">
+                    <h6 id="confirmationMessage" class="text-center"></h6>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="confirmAction">Confirm</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize modal
+    const modal = new bootstrap.Modal(document.getElementById('actionConfirmationModal'));
+    let currentForm = null;
+
+    // Handle archive/unarchive button clicks
+    document.querySelectorAll('.archive-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentForm = this.closest('form');
+            
+            // Get student name and archive status
+            const studentName = this.dataset.studentName;
+            const isArchived = this.dataset.isArchived === '1';
+            
+            // Set confirmation message
+            const message = isArchived 
+                ? `Are you sure you want to unarchive ${studentName}?`
+                : `Are you sure you want to archive ${studentName}?`;
+            document.getElementById('confirmationMessage').textContent = message;
+            
+            modal.show();
+        });
+    });
+
+    // Handle confirmation button click
+    document.getElementById('confirmAction').addEventListener('click', function() {
+        if (currentForm) {
+            currentForm.submit();
+        }
+        modal.hide();
+    });
+
     // Auto-dismiss success alert
     setTimeout(function() {
         const alert = document.getElementById('successAlert');
         if (alert) {
-            // Add fade out effect
             alert.style.transition = 'opacity 0.5s ease';
             alert.style.opacity = '0';
-            
-            // Remove the element after fade out
-            setTimeout(function() {
-                alert.remove();
-            }, 500);
+            setTimeout(() => alert.remove(), 500);
         }
     }, 2500);
-
-    // Add status filter functionality
-    const statusFilter = document.getElementById('status-filter');
-    if (statusFilter) {
-        statusFilter.addEventListener('change', function() {
-            const baseUrl = '{{ route('admin.students.index') }}';
-            const status = this.value;
-            
-            if (status === 'active') {
-                window.location.href = baseUrl;
-            } else {
-                window.location.href = `${baseUrl}?status=${status}`;
-            }
-        });
-    }
 });
 </script>
 @endpush
