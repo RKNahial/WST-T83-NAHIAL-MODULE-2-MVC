@@ -87,7 +87,9 @@
                                     <form action="{{ route('admin.subjects.destroy', $subject->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this subject?')">
+                                        <button type="submit" class="btn btn-danger btn-sm delete-btn" 
+                                                data-subject-name="{{ $subject->name }}" 
+                                                data-subject-code="{{ $subject->code }}">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
@@ -101,6 +103,27 @@
         </div>
     </div>
 </section>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">  
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-question mb-3">
+                    <h6 id="deleteConfirmationMessage" class="text-center"></h6>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @push('scripts')
 <script>
@@ -169,6 +192,37 @@
         if (semesterFilter) {
             semesterFilter.addEventListener('change', filterTable);
         }
+    });
+
+    // Delete confirmation modal handling
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
+        let deleteForm = null;
+
+        // Handle delete button clicks
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                deleteForm = this.closest('form');
+                
+                const subjectName = this.dataset.subjectName;
+                const subjectCode = this.dataset.subjectCode;
+                
+                // Set confirmation message
+                const message = `Are you sure you want to delete ${subjectName} (${subjectCode})?`;
+                document.getElementById('deleteConfirmationMessage').textContent = message;
+                
+                deleteModal.show();
+            });
+        });
+
+        // Handle confirmation button click
+        document.getElementById('confirmDelete').addEventListener('click', function() {
+            if (deleteForm) {
+                deleteForm.submit();
+            }
+            deleteModal.hide();
+        });
     });
 </script>
 @endpush
