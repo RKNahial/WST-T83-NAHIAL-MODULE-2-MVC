@@ -15,10 +15,16 @@ class StudentMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() || $request->user()->role !== 'student') {
-            abort(403, 'Unauthorized action.');
+        if (auth()->check() && auth()->user()->role === 'student') {
+            // Check if the user has a student profile
+            if (!auth()->user()->student) {
+                auth()->logout();
+                return redirect()->route('login')
+                    ->with('error', 'Student profile not found. Please contact administrator.');
+            }
+            return $next($request);
         }
-
-        return $next($request);
+        
+        return redirect()->route('login');
     }
 }

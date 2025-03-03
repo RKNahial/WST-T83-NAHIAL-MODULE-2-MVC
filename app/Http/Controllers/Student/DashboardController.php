@@ -14,7 +14,18 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $student = auth()->user()->student;
+        // Get the authenticated user
+        $user = auth()->user();
+        
+        // Check if user has an associated student record
+        if (!$user || !$user->student) {
+            // Redirect to login with an error message
+            return redirect()->route('login')
+                ->with('error', 'Student profile not found. Please contact administrator.');
+        }
+
+        // Rest of your dashboard logic
+        $student = $user->student;
         
         // Get current academic year and semester from settings
         $currentAcademicYear = Setting::where('name', 'current_academic_year')->first()->value ?? '2023-2024';
