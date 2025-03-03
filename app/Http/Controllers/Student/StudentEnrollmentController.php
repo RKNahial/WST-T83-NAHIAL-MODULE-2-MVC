@@ -9,26 +9,40 @@ use App\Models\Subject;
 
 class StudentEnrollmentController extends Controller
 {
-    public function subjects()
+    public function subjects(Request $request)
     {
-        $student = auth()->user()->student;
-        
-        // Get all enrollments
-        $enrolledSubjects = Enrollment::where('student_id', $student->id)
-            ->with(['subject', 'grade'])
-            ->get();
+        try {
+            $student = auth()->user()->student;
+            
+            // Start query builder
+            $query = Enrollment::where('student_id', $student->id)
+                ->with(['subject', 'grade']);
 
-        // Get unique academic years for the filter
-        $academicYears = Enrollment::where('student_id', $student->id)
-            ->distinct()
-            ->pluck('academic_year')
-            ->sort()
-            ->values();
+            // Filter by academic year if selected
+            if ($request->filled('academic_year')) {
+                $query->where('academic_year', '=', $request->academic_year);
+            }
 
-        return view('student.enrollment.subjects', [
-            'enrolledSubjects' => $enrolledSubjects,
-            'academicYears' => $academicYears
-        ]);
+            // Filter by semester if selected
+            if ($request->filled('semester')) {
+                $semesterMap = [
+                    'First Semester' => 1,
+                    'Second Semester' => 2,
+                    'Summer' => 3
+                ];
+                $query->where('semester', '=', $semesterMap[$request->semester] ?? $request->semester);
+            }
+
+            $enrolledSubjects = $query->get();
+
+            return view('student.enrollment.subjects', [
+                'enrolledSubjects' => $enrolledSubjects
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error loading student subjects: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred while loading subjects.');
+        }
     }
 
     public function history()
