@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\StoreGradeRequest;
+use App\Http\Requests\Admin\UpdateGradeRequest;
 use App\Models\Grade;
 use App\Models\Enrollment;
 use Illuminate\Support\Facades\Log;
@@ -33,17 +34,13 @@ class GradeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreGradeRequest $request)
     {
-        $validated = $request->validate([
-            'enrollment_id' => 'required|exists:enrollments,id',
-            'grade' => 'required|numeric|between:1.00,5.00',
-        ]);
-        
         // Create the grade with the validated data
-        $grade = Grade::create($validated);
+        $grade = Grade::create($request->validated());
         
-        return redirect()->route('admin.grades.index')->with('success', 'Grade added successfully');
+        return redirect()->route('admin.grades.index')
+            ->with('success', 'Grade added successfully');
     }
 
     /**
@@ -65,14 +62,10 @@ class GradeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Grade $grade)
+    public function update(UpdateGradeRequest $request, Grade $grade)
     {
         try {
-            $validated = $request->validate([
-                'grade' => 'required|numeric|in:1.00,1.25,1.50,1.75,2.00,2.25,2.50,2.75,3.00,5.00'
-            ]);
-
-            $grade->update($validated);
+            $grade->update($request->validated());
 
             return redirect()->route('admin.grades.index')
                 ->with('success', 'Grade updated successfully.');
