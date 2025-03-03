@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreAdminRequest;
+use App\Http\Requests\Admin\UpdateAdminRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -34,20 +36,8 @@ class AdminController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreAdminRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => [
-                'required',
-                'email',
-                'unique:users',
-                'regex:/^[a-zA-Z0-9._%+-]+@buksu\.edu\.ph$/'
-            ],
-        ], [
-            'email.regex' => 'Email must use the @buksu.edu.ph domain.'
-        ]);
-
         // Generate a temporary password
         $temporaryPassword = substr(str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&'), 0, 10);
 
@@ -90,20 +80,8 @@ class AdminController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $admin)
+    public function update(UpdateAdminRequest $request, User $admin)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => [
-                'required',
-                'email',
-                'unique:users,email,' . $admin->id,
-                'regex:/^[a-zA-Z0-9._%+-]+@buksu\.edu\.ph$/'
-            ],
-        ], [
-            'email.regex' => 'Email must use the @buksu.edu.ph domain.'
-        ]);
-
         try {
             $admin->update([
                 'name' => $request->name,
