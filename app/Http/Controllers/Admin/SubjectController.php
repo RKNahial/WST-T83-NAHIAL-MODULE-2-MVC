@@ -13,7 +13,7 @@ class SubjectController extends Controller
      */
     public function index()
     {
-        $subjects = Subject::all();
+        $subjects = Subject::withCount('enrollments')->get();
         return view('admin.subjects.index', compact('subjects'));
     }
 
@@ -105,12 +105,13 @@ class SubjectController extends Controller
      */
     public function destroy(Subject $subject)
     {
-        try {
-            $subject->delete();
-            return redirect()->route('admin.subjects.index')
-                ->with('success', 'Subject deleted successfully');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Failed to delete subject. Please try again.');
+        if ($subject->enrollments()->exists()) {
+            return redirect()->back()
+                ->with('error', "Cannot delete subject {$subject->name} ({$subject->code}). There are students currently enrolled in this subject.");
         }
+
+        $subject->delete();
+        return redirect()->back()
+                ->with('success', "Subject '{$subject->name}' ({$subject->code}) has been deleted successfully.");
     }
 }
