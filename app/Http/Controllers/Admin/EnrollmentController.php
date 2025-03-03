@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreEnrollmentRequest;
+use App\Http\Requests\Admin\UpdateEnrollmentRequest;
 use App\Models\Enrollment;
 use App\Models\Student;
 use App\Models\Subject;
@@ -40,7 +42,7 @@ class EnrollmentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEnrollmentRequest $request)
     {
         try {
             // Find student
@@ -78,7 +80,6 @@ class EnrollmentController extends Controller
                 'status' => $request->status
             ]);
 
-            // Single success message
             return redirect()->route('admin.enrollments.index')
                 ->with('success', 'Student enrolled successfully.');
             
@@ -130,17 +131,10 @@ class EnrollmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Enrollment $enrollment)
+    public function update(UpdateEnrollmentRequest $request, Enrollment $enrollment)
     {
-        $validated = $request->validate([
-            'subject_id' => 'required|exists:subjects,id',
-            'semester' => 'required|in:1,2,3',
-            'academic_year' => 'required|string',
-            'status' => 'required|in:enrolled,dropped,completed'
-        ]);
-
         try {
-            $enrollment->update($validated);
+            $enrollment->update($request->validated());
 
             return redirect()->route('admin.enrollments.index')
                 ->with('success', 'Student enrolled successfully.');

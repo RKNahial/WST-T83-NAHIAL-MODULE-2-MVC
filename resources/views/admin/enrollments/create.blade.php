@@ -1,17 +1,8 @@
 @extends('layouts.app')
 
-@section('content')
-<div class="pagetitle">
-    <h1>Add New Enrollment</h1>
-    <nav>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.enrollments.index') }}">Enrollments</a></li>
-            <li class="breadcrumb-item active">Add New</li>
-        </ol>
-    </nav>
-</div>
+@section('title', 'Enrollment')
 
+@section('content')
 <!-- Display error messages outside the card -->
 @if(session('error'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
