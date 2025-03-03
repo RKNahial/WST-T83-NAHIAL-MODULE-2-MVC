@@ -94,7 +94,7 @@
                             <h3 class="mt-4" style="color: #012970;">No Grades Available Yet</h3>
                             <p class="text-muted mb-4 px-4">
                                 You don't have any academic records or grades at the moment. 
-                                Grades will appear here once they are submitted by your instructors.
+                                Grades will appear here once they are submitted to the system.
                             </p>
                         </div>
                     </div>
