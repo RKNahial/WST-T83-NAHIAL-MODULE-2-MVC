@@ -15,18 +15,31 @@ class EnrollmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $enrollments = Enrollment::with(['student', 'subject'])
-                ->whereHas('student', function($query) {
-                    $query->where('is_archived', false);
-                })
-                ->get();
+            $query = Enrollment::with(['student', 'subject']);
+
+            // Filter by academic year if selected
+            if ($request->filled('academic_year')) {
+                $query->where('academic_year', '=', $request->academic_year);
+            }
+
+            // Filter by semester if selected
+            if ($request->filled('semester')) {
+                $semesterMap = [
+                    'First Semester' => 1,
+                    'Second Semester' => 2,
+                    'Summer' => 3
+                ];
+                $query->where('semester', '=', $semesterMap[$request->semester] ?? $request->semester);
+            }
+
+            $enrollments = $query->get();
+
             return view('admin.enrollments.index', compact('enrollments'));
         } catch (\Exception $e) {
             \Log::error('Enrollment index error: ' . $e->getMessage());
-            dd($e->getMessage()); 
             return back()->with('error', 'An error occurred while loading enrollments.');
         }
     }

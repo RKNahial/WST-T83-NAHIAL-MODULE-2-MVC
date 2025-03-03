@@ -17,25 +17,29 @@
                     <div class="d-flex justify-content-between align-items-center mb-1 mt-3 mx-2">
                         <h5 class="card-title mb-0">Grades List</h5>
                         <div class="d-flex gap-2 align-items-center">
-                            <!-- Academic Year Filter -->
-                            <select id="yearFilter" class="form-select" style="width: auto;">
-                                <option value="">All Years</option>
-                                @php
-                                    $currentYear = 2024;  // Starting from 2024
-                                    $endYear = $currentYear + 2;  // Will show up to 2026
-                                @endphp
-                                @for($year = $currentYear; $year <= $endYear; $year++)
-                                    <option value="{{ $year }}-{{ $year + 1 }}">{{ $year }}-{{ $year + 1 }}</option>
-                                @endfor
-                            </select>
+                            <form method="GET" action="{{ route('admin.grades.index') }}" class="d-flex gap-2 align-items-center">
+                                <!-- Academic Year Filter -->
+                                <select name="academic_year" class="form-select" style="width: auto;" onchange="this.form.submit()">
+                                    <option value="">All Years</option>
+                                    @php
+                                        $currentYear = 2024;
+                                        $endYear = $currentYear + 2;
+                                    @endphp
+                                    @for($year = $currentYear; $year <= $endYear; $year++)
+                                        <option value="{{ $year }}-{{ $year + 1 }}" {{ request('academic_year') == "$year-".($year + 1) ? 'selected' : '' }}>
+                                            {{ $year }}-{{ $year + 1 }}
+                                        </option>
+                                    @endfor
+                                </select>
 
-                            <!-- Semester Filter -->
-                            <select id="semesterFilter" class="form-select" style="width: auto;">
-                                <option value="">All Semesters</option>
-                                <option value="First Semester">First Semester</option>
-                                <option value="Second Semester">Second Semester</option>
-                                <option value="Summer">Summer</option>
-                            </select>
+                                <!-- Semester Filter -->
+                                <select name="semester" class="form-select" style="width: auto;" onchange="this.form.submit()">
+                                    <option value="">All Semesters</option>
+                                    <option value="First Semester" {{ request('semester') == 'First Semester' ? 'selected' : '' }}>First Semester</option>
+                                    <option value="Second Semester" {{ request('semester') == 'Second Semester' ? 'selected' : '' }}>Second Semester</option>
+                                    <option value="Summer" {{ request('semester') == 'Summer' ? 'selected' : '' }}>Summer</option>
+                                </select>
+                            </form>
                         </div>
                     </div>
 
@@ -264,9 +268,6 @@
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Store the original table HTML for reset purposes
-        const originalTableHTML = document.querySelector('.datatable tbody').innerHTML;
-        
         // Initialize DataTable with specific configuration
         const datatable = new simpleDatatables.DataTable(".datatable", {
             perPageSelect: false,
@@ -277,89 +278,6 @@
                 noRows: `<div class="alert alert-info mb-0">No records found for the selected filters.</div>`
             }
         });
-
-        const yearFilter = document.getElementById('yearFilter');
-        const semesterFilter = document.getElementById('semesterFilter');
-
-        function filterTable() {
-            const yearValue = yearFilter.value;
-            const semesterValue = semesterFilter.value;
-
-            // Reset table to original state first
-            const tableBody = document.querySelector('.datatable tbody');
-            tableBody.innerHTML = originalTableHTML;
-
-            // Get all rows from the table
-            const rows = Array.from(document.querySelectorAll('.datatable tbody tr'));
-            let visibleCount = 0;
-
-            rows.forEach(row => {
-                // Skip if it's a message row
-                if (row.querySelector('td[colspan]')) return;
-
-                const yearCell = row.cells[5]?.textContent.trim(); // Academic Year column
-                const semesterCell = row.cells[4]?.textContent.trim(); // Semester column
-
-                const yearMatch = !yearValue || yearCell === yearValue;
-                const semesterMatch = !semesterValue || semesterCell === semesterValue;
-
-                if (yearMatch && semesterMatch) {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            if (visibleCount === 0) {
-                // Clear existing content
-                tableBody.innerHTML = '';
-                
-                // Create and append no results message
-                const noResultsRow = document.createElement('tr');
-                noResultsRow.className = 'no-results-message'; // Add a class for identification
-                noResultsRow.innerHTML = `
-                    <td colspan="8" class="text-center">
-                        <div class="alert alert-info mb-0">
-                            No records found for the selected filters.
-                        </div>
-                    </td>
-                `;
-                tableBody.appendChild(noResultsRow);
-
-                // Prevent DataTable from removing our message
-                setTimeout(() => {
-                    if (document.querySelector('.no-results-message') === null) {
-                        tableBody.appendChild(noResultsRow.cloneNode(true));
-                    }
-                }, 100);
-            }
-
-            // Force DataTable to update
-            datatable.refresh();
-
-            // Double-check message after refresh
-            setTimeout(() => {
-                if (visibleCount === 0 && !document.querySelector('.no-results-message')) {
-                    const noResultsRow = document.createElement('tr');
-                    noResultsRow.className = 'no-results-message';
-                    noResultsRow.innerHTML = `
-                        <td colspan="8" class="text-center">
-                            <div class="alert alert-info mb-0">
-                                No records found for the selected filters.
-                            </div>
-                        </td>
-                    `;
-                    tableBody.appendChild(noResultsRow);
-                }
-            }, 150);
-        }
-
-        // Add filter event listeners
-        if (yearFilter && semesterFilter) {
-            yearFilter.addEventListener('change', filterTable);
-            semesterFilter.addEventListener('change', filterTable);
-        }
 
         // Handle success alert auto-dismiss
         setTimeout(function() {

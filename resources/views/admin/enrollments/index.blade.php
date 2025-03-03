@@ -17,26 +17,30 @@
                     <div class="d-flex justify-content-between align-items-center mb-1 mt-3 mx-2">
                         <h5 class="card-title mb-0">Enrollment List</h5>
                         <div class="d-flex gap-2 align-items-center">
-                            
-                          <!-- Academic Year Filter -->
-                          <select id="yearFilter" class="form-select" style="width: auto;">
-                                <option value="">All Years</option>
-                                @php
-                                    $currentYear = 2024;  
-                                    $endYear = $currentYear + 2;  
-                                @endphp
-                                @for($year = $currentYear; $year <= $endYear; $year++)
-                                    <option value="{{ $year }}-{{ $year + 1 }}">{{ $year }}-{{ $year + 1 }}</option>
-                                @endfor
-                            </select>
-                            
-                        <!-- Semester Filter -->
-                            <select id="semesterFilter" class="form-select" style="width: auto;">
-                                <option value="">All Semesters</option>
-                                <option value="First Semester">First Semester</option>
-                                <option value="Second Semester">Second Semester</option>
-                                <option value="Summer">Summer</option>
-                            </select>
+                            <!-- Replace your current filters with this form -->
+                            <form method="GET" action="{{ route('admin.enrollments.index') }}" class="d-flex gap-2 align-items-center">
+                                <!-- Academic Year Filter -->
+                                <select name="academic_year" class="form-select" style="width: auto;" onchange="this.form.submit()">
+                                    <option value="">All Years</option>
+                                    @php
+                                        $currentYear = 2024;  
+                                        $endYear = $currentYear + 2;  
+                                    @endphp
+                                    @for($year = $currentYear; $year <= $endYear; $year++)
+                                        <option value="{{ $year }}-{{ $year + 1 }}" {{ request('academic_year') == "$year-".($year + 1) ? 'selected' : '' }}>
+                                            {{ $year }}-{{ $year + 1 }}
+                                        </option>
+                                    @endfor
+                                </select>
+                                
+                                <!-- Semester Filter -->
+                                <select name="semester" class="form-select" style="width: auto;" onchange="this.form.submit()">
+                                    <option value="">All Semesters</option>
+                                    <option value="First Semester" {{ request('semester') == 'First Semester' ? 'selected' : '' }}>First Semester</option>
+                                    <option value="Second Semester" {{ request('semester') == 'Second Semester' ? 'selected' : '' }}>Second Semester</option>
+                                    <option value="Summer" {{ request('semester') == 'Summer' ? 'selected' : '' }}>Summer</option>
+                                </select>
+                            </form>
 
                             <!-- Enroll Student Button -->
                             <a href="{{ route('admin.enrollments.create') }}" class="btn btn-primary">

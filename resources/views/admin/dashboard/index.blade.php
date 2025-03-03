@@ -56,7 +56,7 @@
                                 </div>
                                 <div class="ps-3">
                                     <h6>{{ $currentEnrollments }}</h6>
-                                    <span class="text-muted small pt-2">This semester</span>
+                                    <span class="text-muted small pt-2">Currently Enrolled</span>
                                 </div>
                             </div>
                         </div>

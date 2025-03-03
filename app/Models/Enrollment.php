@@ -17,6 +17,17 @@ class Enrollment extends Model
         'status'
     ];
 
+    // Add this to ensure consistent academic year format
+    protected function getAcademicYearAttribute($value)
+    {
+        return $value; // Returns the value as stored in DB
+    }
+
+    protected function setAcademicYearAttribute($value)
+    {
+        $this->attributes['academic_year'] = $value; // Stores the value as is
+    }
+
     // Define relationship with Student
     public function student()
     {

@@ -8,22 +8,44 @@ use App\Http\Requests\Admin\UpdateGradeRequest;
 use App\Models\Grade;
 use App\Models\Enrollment;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class GradeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $enrollments = Enrollment::with(['student', 'subject', 'grade'])
-            ->whereHas('student', function($query) {
-                $query->where('is_archived', false);
-            })
-            ->where('status', 'enrolled')
-            ->get();
-        
-        return view('admin.grades.index', compact('enrollments'));
+        try {
+            $query = Enrollment::with(['student', 'subject', 'grade'])
+                ->whereHas('student', function($query) {
+                    $query->where('is_archived', false);
+                })
+                ->where('status', 'enrolled');
+
+            // Filter by academic year if selected
+            if ($request->filled('academic_year')) {
+                $query->where('academic_year', '=', $request->academic_year);
+            }
+
+            // Filter by semester if selected
+            if ($request->filled('semester')) {
+                $semesterMap = [
+                    'First Semester' => 1,
+                    'Second Semester' => 2,
+                    'Summer' => 3
+                ];
+                $query->where('semester', '=', $semesterMap[$request->semester] ?? $request->semester);
+            }
+
+            $enrollments = $query->get();
+            
+            return view('admin.grades.index', compact('enrollments'));
+        } catch (\Exception $e) {
+            Log::error('Error loading grades: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred while loading grades.');
+        }
     }
 
     /**
