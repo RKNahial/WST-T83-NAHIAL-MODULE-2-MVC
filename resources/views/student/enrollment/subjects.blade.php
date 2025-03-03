@@ -73,7 +73,9 @@
                                     @endswitch
                                 </td>
                                 <td>
-                                    @if($subject->grade)
+                                    @if($subject->status == 'dropped')
+                                        <span class="badge bg-secondary">N/A</span>
+                                    @elseif($subject->grade)
                                         {{ number_format($subject->grade->grade, 2) }}
                                     @else
                                         <span class="badge bg-warning">No grade yet</span>
