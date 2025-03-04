@@ -18,7 +18,10 @@ class EnrollmentController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Enrollment::with(['student', 'subject']);
+            $query = Enrollment::with(['student', 'subject'])
+                ->whereHas('student', function($query) {
+                    $query->where('is_archived', false);
+                });
 
             // Filter by academic year if selected
             if ($request->filled('academic_year')) {
