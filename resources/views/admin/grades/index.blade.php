@@ -156,7 +156,7 @@
                                                 
                                                 <div class="mb-3">
                                                     <label for="grade" class="form-label">Grade</label>
-                                                    <select class="form-select" name="grade" required>
+                                                    <select class="form-select @error('grade') is-invalid @enderror" name="grade" required>
                                                         <option value="">Select Grade</option>
                                                         <option value="1.00">1.00</option>
                                                         <option value="1.25">1.25</option>
@@ -169,6 +169,11 @@
                                                         <option value="3.00">3.00</option>
                                                         <option value="5.00">5.00</option>
                                                     </select>
+                                                    @error('grade')
+                                                        <div class="alert alert-danger mt-2">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
@@ -211,7 +216,7 @@
                                                 
                                                 <div class="mb-3">
                                                     <label for="grade" class="form-label">Grade</label>
-                                                    <select class="form-select" name="grade" required>
+                                                    <select class="form-select @error('grade') is-invalid @enderror" name="grade" required>
                                                         <option value="">Select Grade</option>
                                                         <option value="1.00" {{ $enrollment->grade->grade == 1.00 ? 'selected' : '' }}>1.00</option>
                                                         <option value="1.25" {{ $enrollment->grade->grade == 1.25 ? 'selected' : '' }}>1.25</option>
@@ -224,6 +229,11 @@
                                                         <option value="3.00" {{ $enrollment->grade->grade == 3.00 ? 'selected' : '' }}>3.00</option>
                                                         <option value="5.00" {{ $enrollment->grade->grade == 5.00 ? 'selected' : '' }}>5.00</option>
                                                     </select>
+                                                    @error('grade')
+                                                        <div class="alert alert-danger mt-2">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
                                                 </div>
                                             </div>
                                             <div class="modal-footer">

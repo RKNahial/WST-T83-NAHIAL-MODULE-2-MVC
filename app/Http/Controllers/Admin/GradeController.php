@@ -68,14 +68,14 @@ class GradeController extends Controller
             if ($existingGrade) {
                 // If grade exists, update it instead of creating new
                 $existingGrade->update([
-                    'grade' => $request->grade
+                    'grade' => $request->validated()['grade']  // Use validated data
                 ]);
                 
                 return redirect()->route('admin.grades.index')
                     ->with('success', 'Grade updated successfully');
             }
 
-            // If no existing grade, create new one
+            // If no existing grade, create new one using validated data
             $grade = Grade::create($request->validated());
             
             return redirect()->route('admin.grades.index')
