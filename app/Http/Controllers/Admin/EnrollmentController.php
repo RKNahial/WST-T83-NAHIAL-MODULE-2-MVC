@@ -171,9 +171,13 @@ class EnrollmentController extends Controller
     public function destroy(Enrollment $enrollment)
     {
         try {
+            // Only check for grades if the enrollment is not dropped
+            if ($enrollment->status !== 'dropped' && $enrollment->grade) {
+                return back()->with('error', 'Cannot delete enrollment because it has an associated grade. Please delete the grade first.');
+            }
+
             $enrollment->delete();
             
-            // Single success message
             return redirect()->route('admin.enrollments.index')
                 ->with('success', 'Enrollment deleted successfully.');
         } catch (\Exception $e) {

@@ -12,6 +12,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" id="errorAlert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-1 mt-3 mx-2">
@@ -229,6 +235,16 @@
                 alert.style.transition = 'opacity 0.5s ease';
                 alert.style.opacity = '0';
                 setTimeout(() => alert.remove(), 500);
+            }
+        }, 2500);
+
+        // Auto-dismiss error alert
+        setTimeout(function() {
+            const errorAlert = document.getElementById('errorAlert');
+            if (errorAlert) {
+                errorAlert.style.transition = 'opacity 0.5s ease';
+                errorAlert.style.opacity = '0';
+                setTimeout(() => errorAlert.remove(), 500);
             }
         }, 2500);
 
