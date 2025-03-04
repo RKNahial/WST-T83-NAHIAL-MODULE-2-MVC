@@ -22,7 +22,7 @@ class GradeController extends Controller
                 ->whereHas('student', function($query) {
                     $query->where('is_archived', false);
                 })
-                ->where('status', 'enrolled');
+                ->whereIn('status', ['enrolled', 'completed']);
 
             // Filter by academic year if selected
             if ($request->filled('academic_year')) {
