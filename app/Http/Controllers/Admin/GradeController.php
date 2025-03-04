@@ -61,11 +61,32 @@ class GradeController extends Controller
      */
     public function store(StoreGradeRequest $request)
     {
-        // Create the grade with the validated data
-        $grade = Grade::create($request->validated());
-        
-        return redirect()->route('admin.grades.index')
-            ->with('success', 'Grade added successfully');
+        try {
+            // Check if a grade already exists for this enrollment
+            $existingGrade = Grade::where('enrollment_id', $request->enrollment_id)->first();
+            
+            if ($existingGrade) {
+                // If grade exists, update it instead of creating new
+                $existingGrade->update([
+                    'grade' => $request->grade
+                ]);
+                
+                return redirect()->route('admin.grades.index')
+                    ->with('success', 'Grade updated successfully');
+            }
+
+            // If no existing grade, create new one
+            $grade = Grade::create($request->validated());
+            
+            return redirect()->route('admin.grades.index')
+                ->with('success', 'Grade added successfully');
+            
+        } catch (\Exception $e) {
+            Log::error('Error storing grade: ' . $e->getMessage());
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to save grade. ' . $e->getMessage()]);
+        }
     }
 
     /**
