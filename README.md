@@ -6,3 +6,6 @@ This Student Information System is built with Laravel. It provides secure authen
 
 ## Names of Student
 - Rovelle Kate L. Nahial
+
+## GitHub Link
+https://github.com/RKNahial/WST-T83-NAHIAL-MODULE-2-MVC.git
